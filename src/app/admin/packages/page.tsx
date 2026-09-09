@@ -151,7 +151,7 @@ export default function PackagesPage() {
                   </select>
                 </div>
                 <div>
-                  <label className="block font-mono text-[10px] uppercase tracking-widest text-white/40 mb-2">Package Title (e.g. "Micro" or "Ruracio")</label>
+                  <label className="block font-mono text-[10px] uppercase tracking-widest text-white/40 mb-2">Package Title (e.g. &quot;Micro&quot; or &quot;Ruracio&quot;)</label>
                   <input 
                     type="text"
                     value={formData.title}
@@ -161,7 +161,7 @@ export default function PackagesPage() {
                   />
                 </div>
                 <div>
-                  <label className="block font-mono text-[10px] uppercase tracking-widest text-white/40 mb-2">Description (e.g. "0-10 Pax")</label>
+                  <label className="block font-mono text-[10px] uppercase tracking-widest text-white/40 mb-2">Description (e.g. &quot;0-10 Pax&quot;)</label>
                   <input 
                     type="text"
                     value={formData.description}
