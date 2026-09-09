@@ -3,7 +3,7 @@
 import { useQuery, useMutation } from "convex/react";
 import { api } from "../../../../convex/_generated/api";
 import { format } from "date-fns";
-import { Clock, MapPin, Plus, X, MoreVertical, Trash2, XCircle, LogOut } from "lucide-react";
+import { Clock, MapPin, Plus, X, MoreVertical, Trash2, XCircle, LogOut, CheckCircle } from "lucide-react";
 import { useState, useRef, useEffect } from "react";
 
 export default function BookingsPage() {
@@ -18,6 +18,7 @@ export default function BookingsPage() {
   const upcoming = activeBookings.filter((b: any) => b.checkIn > now);
 
   const createBooking = useMutation(api.bookings?.createBooking || (() => Promise.resolve()));
+  const confirmPayment = useMutation(api.bookings?.confirmPayment || (() => Promise.resolve()));
   const deleteBooking = useMutation(api.bookings?.deleteBooking || (() => Promise.resolve()));
   const updateBookingStatus = useMutation(api.bookings?.updateBookingStatus || (() => Promise.resolve()));
 
@@ -82,6 +83,7 @@ export default function BookingsPage() {
                 booking={booking} 
                 onDelete={(id) => deleteBooking({ id: id as any })} 
                 onUpdateStatus={(id, status, checkOut) => updateBookingStatus({ id: id as any, status, checkOut })}
+                onConfirmPayment={(id) => confirmPayment({ id: id as any })}
               />
             ))}
             {hosting.length === 0 && (
@@ -103,6 +105,7 @@ export default function BookingsPage() {
                 booking={booking} 
                 onDelete={(id) => deleteBooking({ id: id as any })} 
                 onUpdateStatus={(id, status, checkOut) => updateBookingStatus({ id: id as any, status, checkOut })}
+                onConfirmPayment={(id) => confirmPayment({ id: id as any })}
               />
             ))}
             {upcoming.length === 0 && (
@@ -243,7 +246,7 @@ export default function BookingsPage() {
   );
 }
 
-function BookingCard({ booking, onDelete, onUpdateStatus }: { booking: any, onDelete: (id: string) => void, onUpdateStatus: (id: string, status: string, checkOut?: number) => void }) {
+function BookingCard({ booking, onDelete, onUpdateStatus, onConfirmPayment }: { booking: any, onDelete: (id: string) => void, onUpdateStatus: (id: string, status: string, checkOut?: number) => void, onConfirmPayment: (id: string) => void }) {
   const duration = Math.round((booking.checkOut - booking.checkIn) / (1000 * 60 * 60 * 24));
   const [openDropdown, setOpenDropdown] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -289,6 +292,11 @@ function BookingCard({ booking, onDelete, onUpdateStatus }: { booking: any, onDe
             {booking.bookingType === "event" && (
               <span className="bg-[#c2a27c] text-black font-mono text-[10px] uppercase tracking-widest px-2 py-0.5 rounded-sm font-bold">Event</span>
             )}
+            {booking.paymentStatus === "pending" ? (
+              <span className="bg-amber-500/20 text-amber-500 border border-amber-500/30 font-mono text-[10px] uppercase tracking-widest px-2 py-0.5 rounded-sm font-bold animate-pulse">Pending Payment</span>
+            ) : booking.paymentStatus === "confirmed" ? (
+              <span className="bg-green-500/20 text-green-500 border border-green-500/30 font-mono text-[10px] uppercase tracking-widest px-2 py-0.5 rounded-sm font-bold">Paid</span>
+            ) : null}
           </div>
           <div className="flex flex-col items-end gap-1 shrink-0">
             <span className="font-mono text-[10px] text-white/30 uppercase">ID: {booking.bookingId || booking._id.substring(0,6)}</span>
@@ -340,6 +348,20 @@ function BookingCard({ booking, onDelete, onUpdateStatus }: { booking: any, onDe
                 className="w-full text-left px-4 py-2 text-sm text-[#e8e0d4] hover:bg-white/5 transition-colors flex items-center gap-2"
               >
                 <XCircle className="w-4 h-4 text-white/50" /> Revoke Booking
+              </button>
+            )}
+            
+            {booking.status === "upcoming" && booking.paymentStatus === "pending" && (
+              <button 
+                onClick={() => {
+                  if (confirm("Confirm that payment has been received? This will secure the booking and send a confirmation email.")) {
+                    onConfirmPayment(booking._id);
+                    setOpenDropdown(false);
+                  }
+                }}
+                className="w-full text-left px-4 py-2 text-sm text-[#c2a27c] hover:bg-white/5 transition-colors flex items-center gap-2 font-medium"
+              >
+                <CheckCircle className="w-4 h-4 text-[#c2a27c]" /> Confirm Payment
               </button>
             )}
             

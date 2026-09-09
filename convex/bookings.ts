@@ -1,5 +1,6 @@
 import { mutation, query } from "./_generated/server";
 import { v } from "convex/values";
+import { api } from "./_generated/api";
 
 export const getBookings = query({
   handler: async (ctx) => {
@@ -75,12 +76,9 @@ export const createBooking = mutation({
       throw new Error("Dates unavailable");
     }
 
-    // Determine status (if checkIn is today or past but checkout is future -> hosting, else upcoming)
-    const now = Date.now();
+    // New bookings are unconditionally marked as upcoming and pending until admin confirms payment
     let status = "upcoming";
-    if (args.checkIn <= now && args.checkOut >= now) {
-      status = "hosting";
-    }
+    const paymentStatus = "pending";
 
     // Generate custom booking ID
     const recentBooking = await ctx.db.query("bookings").order("desc").first();
@@ -96,7 +94,16 @@ export const createBooking = mutation({
     const bookingId = await ctx.db.insert("bookings", {
       ...args,
       status,
+      paymentStatus,
       bookingId: bookingIdString,
+    });
+
+    // Schedule the booking received email
+    await ctx.scheduler.runAfter(0, api.emails.sendBookingReceivedEmail, {
+      guestName: args.guestName,
+      email: args.email,
+      checkIn: args.checkIn,
+      checkOut: args.checkOut,
     });
 
     // Handle guest profile creation/update
@@ -143,5 +150,35 @@ export const updateBookingStatus = mutation({
       patchData.checkOut = args.checkOut;
     }
     await ctx.db.patch(args.id, patchData);
+  },
+});
+
+export const confirmPayment = mutation({
+  args: { 
+    id: v.id("bookings") 
+  },
+  handler: async (ctx, args) => {
+    const booking = await ctx.db.get(args.id);
+    if (!booking) throw new Error("Booking not found");
+
+    // Promote to hosting if dates match today
+    const now = Date.now();
+    let newStatus = booking.status;
+    if (booking.checkIn <= now && booking.checkOut >= now) {
+      newStatus = "hosting";
+    }
+
+    await ctx.db.patch(args.id, {
+      paymentStatus: "confirmed",
+      status: newStatus,
+    });
+
+    // Schedule the payment confirmed email
+    await ctx.scheduler.runAfter(0, api.emails.sendPaymentConfirmedEmail, {
+      guestName: booking.guestName,
+      email: booking.email,
+      checkIn: booking.checkIn,
+      checkOut: booking.checkOut,
+    });
   },
 });

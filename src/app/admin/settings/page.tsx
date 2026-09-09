@@ -229,7 +229,7 @@ export default function SettingsPage() {
                       value={oldPasscode}
                       onChange={(e) => setOldPasscode(e.target.value.replace(/\D/g,'').slice(0, 5))}
                       placeholder="••••"
-                      className="w-full pl-12 pr-12 py-3 bg-black/60 border border-red-500/20 rounded-lg text-red-100 font-mono text-xl tracking-[0.5em] focus:outline-none focus:border-red-400 transition-colors" 
+                      className="w-full pl-12 pr-12 py-3 bg-black/60 border border-red-500/20 rounded-lg text-red-100 font-mono text-xl tracking-[0.2em] sm:tracking-[0.5em] focus:outline-none focus:border-red-400 transition-colors" 
                     />
                     <button 
                       onClick={() => setShowPasscode(!showPasscode)}
@@ -250,7 +250,7 @@ export default function SettingsPage() {
                         value={newPasscode}
                         onChange={(e) => setNewPasscode(e.target.value.replace(/\D/g,'').slice(0, 5))}
                         placeholder="••••"
-                        className="w-full pl-12 pr-4 py-3 bg-black/60 border border-red-500/20 rounded-lg text-red-100 font-mono text-xl tracking-[0.5em] focus:outline-none focus:border-red-400 transition-colors" 
+                        className="w-full pl-12 pr-4 py-3 bg-black/60 border border-red-500/20 rounded-lg text-red-100 font-mono text-xl tracking-[0.2em] sm:tracking-[0.5em] focus:outline-none focus:border-red-400 transition-colors" 
                       />
                     </div>
                   </div>
@@ -263,7 +263,7 @@ export default function SettingsPage() {
                         value={confirmPasscode}
                         onChange={(e) => setConfirmPasscode(e.target.value.replace(/\D/g,'').slice(0, 5))}
                         placeholder="••••"
-                        className="w-full pl-12 pr-4 py-3 bg-black/60 border border-red-500/20 rounded-lg text-red-100 font-mono text-xl tracking-[0.5em] focus:outline-none focus:border-red-400 transition-colors" 
+                        className="w-full pl-12 pr-4 py-3 bg-black/60 border border-red-500/20 rounded-lg text-red-100 font-mono text-xl tracking-[0.2em] sm:tracking-[0.5em] focus:outline-none focus:border-red-400 transition-colors" 
                       />
                     </div>
                   </div>
@@ -289,7 +289,7 @@ export default function SettingsPage() {
           </div>
           
           <div className="space-y-6 max-w-2xl">
-            <label className="flex items-center justify-between p-6 bg-white/[0.02] border border-white/10 rounded-xl cursor-pointer hover:bg-white/5 transition-colors">
+            <label className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-6 bg-white/[0.02] border border-white/10 rounded-xl cursor-pointer hover:bg-white/5 transition-colors gap-4">
               <div>
                 <p className="font-serif text-2xl text-[#e8e0d4] mb-1">Accept New Bookings</p>
                 <p className="text-sm text-white/50 font-light">If disabled, the public reservation form will show as unavailable.</p>

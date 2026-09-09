@@ -71,7 +71,7 @@ export default function ReservePage() {
   const [arrivalDate, setArrivalDate] = useState<Date | null>(new Date());
   const [departureDate, setDepartureDate] = useState<Date | null>(new Date(new Date().getTime() + 24 * 60 * 60 * 1000));
 
-  const [step, setStep] = useState<"select" | "checking" | "conflict" | "finalize" | "success">("select");
+  const [step, setStep] = useState<"select" | "checking" | "conflict" | "finalize" | "payment" | "success">("select");
   const [suggestedDates, setSuggestedDates] = useState<{arrival: Date, departure: Date} | null>(null);
   const [isPrivacyOpen, setIsPrivacyOpen] = useState(false);
   const [isEventTypeOpen, setIsEventTypeOpen] = useState(false);
@@ -103,21 +103,10 @@ export default function ReservePage() {
   const KES_RATE = 130;
   const nights = Math.max(1, differenceInDays(departureDate || new Date(), arrivalDate || new Date()));
   
-  const getSeasonRate = (date: Date) => {
-    const month = date.getMonth(); 
-    const day = date.getDate();
-    if ((month === 11 && day >= 20) || (month === 0 && day <= 5)) return 80000;
-    if ((month >= 6 && month <= 9) || (month === 0 && day > 5) || month === 1 || month === 2) return 65000;
-    return 56000;
-  };
-
   let calculatedPriceKES = 0;
   if (bookingType === "stay") {
-    let currentDate = new Date(arrivalDate || new Date());
-    for (let i = 0; i < nights; i++) {
-      calculatedPriceKES += getSeasonRate(currentDate);
-      currentDate.setDate(currentDate.getDate() + 1);
-    }
+    const basePriceUSD = settings?.basePricePerNight || 100;
+    calculatedPriceKES = basePriceUSD * KES_RATE * nights;
   } else {
     if (eventGuests <= 100) calculatedPriceKES = 50000;
     else if (eventGuests >= 200) calculatedPriceKES = 100000;
@@ -452,11 +441,21 @@ export default function ReservePage() {
             {/* STEP 2: CHECKING LOADER */}
             {step === "checking" && (
               <motion.div key="checking" variants={variants} initial="initial" animate="animate" exit="exit" transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }} className="w-full flex flex-col items-center justify-center h-full">
-                 <div className="w-32 h-[1px] bg-white/10 relative overflow-hidden mb-12">
+                 <div className="relative w-24 h-24 mb-12 flex items-center justify-center">
                    <motion.div 
-                     className="absolute top-0 bottom-0 left-0 w-1/3 bg-[#c2a27c]"
-                     animate={{ x: ["-100%", "400%"] }}
-                     transition={{ duration: 1.5, ease: "easeInOut", repeat: Infinity }}
+                     className="absolute w-12 h-12 rounded-full bg-[#c2a27c] blur-[15px]"
+                     animate={{ 
+                       scale: [1, 1.8, 1],
+                       opacity: [0.3, 0.7, 0.3]
+                     }}
+                     transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut" }}
+                   />
+                   <motion.div 
+                     className="relative w-6 h-6 rounded-full bg-[#c2a27c]"
+                     animate={{ 
+                       scale: [1, 1.2, 1],
+                     }}
+                     transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut" }}
                    />
                  </div>
                  <h2 className="text-4xl font-serif font-light mb-4">Verifying Dates</h2>
@@ -530,7 +529,7 @@ export default function ReservePage() {
                        eventType: bookingType === "event" ? eventType : undefined,
                        eventGuests: bookingType === "event" ? eventGuests : undefined,
                      });
-                     setStep("success");
+                     setStep("payment");
                    } catch (error) {
                      console.error("Booking failed:", error);
                      setStep("conflict");
@@ -583,14 +582,63 @@ export default function ReservePage() {
               </motion.div>
             )}
 
-            {/* STEP 5: SUCCESS */}
+            {/* STEP 5: PAYMENT INSTRUCTIONS */}
+            {step === "payment" && (
+              <motion.div key="payment" variants={variants} initial="initial" animate="animate" exit="exit" transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }} className="w-full flex flex-col h-full max-w-xl mx-auto">
+                 <div className="text-center mb-8">
+                   <div className="inline-flex items-center gap-4 mb-4">
+                     <p className="font-mono text-[10px] tracking-[0.2em] text-[#c2a27c] uppercase">Secure Your Booking</p>
+                   </div>
+                   <h2 className="text-4xl md:text-5xl font-serif font-light mb-4">Manual Payment</h2>
+                   <p className="text-white/70 font-light text-sm">Please complete your payment using one of the methods below to secure your dates. A confirmation email has been sent.</p>
+                 </div>
+
+                 <div className="space-y-6 mb-12 flex-1">
+                   {/* Mpesa Option */}
+                   <div className="border border-white/10 rounded-xl p-6 bg-white/[0.02]">
+                     <h3 className="font-serif text-2xl mb-4 text-[#c2a27c]">M-PESA Send Money</h3>
+                     <div className="space-y-2 font-light">
+                       <div className="flex justify-between items-center border-b border-white/5 pb-2">
+                         <span className="text-white/50 text-sm">Phone Number</span>
+                         <span className="font-mono text-sm tracking-wider">0708443090</span>
+                       </div>
+                       <div className="flex justify-between items-center pt-2">
+                         <span className="text-white/50 text-sm">Account Name</span>
+                         <span className="text-sm">Patricia Ngugi</span>
+                       </div>
+                     </div>
+                   </div>
+
+                   {/* Equity Bank Option */}
+                   <div className="border border-white/10 rounded-xl p-6 bg-white/[0.02]">
+                     <h3 className="font-serif text-2xl mb-4 text-[#c2a27c]">Equity Bank</h3>
+                     <div className="space-y-2 font-light">
+                       <div className="flex justify-between items-center border-b border-white/5 pb-2">
+                         <span className="text-white/50 text-sm">Account Number</span>
+                         <span className="font-mono text-sm tracking-wider">0590163474798</span>
+                       </div>
+                       <div className="flex justify-between items-center pt-2">
+                         <span className="text-white/50 text-sm">Account Name</span>
+                         <span className="text-sm">Patricia Wangui ngugi</span>
+                       </div>
+                     </div>
+                   </div>
+                 </div>
+
+                 <button onClick={() => setStep("success")} className="w-full h-16 border border-[#c2a27c] text-[#c2a27c] hover:bg-[#c2a27c] hover:text-black transition-all duration-300 font-mono text-[10px] tracking-[0.2em] uppercase cursor-pointer">
+                    I Have Paid
+                 </button>
+              </motion.div>
+            )}
+
+            {/* STEP 6: SUCCESS */}
             {step === "success" && (
               <motion.div key="success" variants={variants} initial="initial" animate="animate" exit="exit" transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }} className="w-full flex flex-col items-center justify-center text-center h-full">
                  <div className="w-20 h-20 rounded-full border border-[#c2a27c] flex items-center justify-center mb-8">
                     <ArrowRight className="w-8 h-8 text-[#c2a27c] -rotate-45" strokeWidth={1} />
                  </div>
-                 <h2 className="text-4xl md:text-5xl font-serif font-light mb-6 whitespace-pre-line">{bookingType === "stay" ? "Your Retreat\nAwaits." : "Your Event\nIs Requested."}</h2>
-                 <p className="text-white/70 font-light max-w-sm mx-auto mb-12">A confirmation email has been dispatched to your inbox with your itinerary.</p>
+                 <h2 className="text-4xl md:text-5xl font-serif font-light mb-6 whitespace-pre-line">{bookingType === "stay" ? "Your Retreat\nAwaits Verification." : "Your Event\nIs Requested."}</h2>
+                 <p className="text-white/70 font-light max-w-sm mx-auto mb-12">Your booking is currently pending. Once our team validates your payment, you will receive a final confirmation email securing your reservation.</p>
                  <Link href="/" className="font-mono text-xs uppercase tracking-widest text-[#c2a27c] hover:text-white transition-colors">
                    Return to Main Site
                  </Link>
@@ -628,24 +676,10 @@ export default function ReservePage() {
              <ul className="space-y-6">
                <li className="flex justify-between items-end group">
                  <div>
-                   <p className="font-serif text-xl text-white group-hover:text-[#c2a27c] transition-colors">Low Season</p>
-                   <p className="font-mono text-[9px] uppercase tracking-wider text-white/40 mt-1">Apr-Jun, Nov-Dec 19</p>
+                   <p className="font-serif text-xl text-white group-hover:text-[#c2a27c] transition-colors">Standard Rate</p>
+                   <p className="font-mono text-[9px] uppercase tracking-wider text-white/40 mt-1">Year-Round</p>
                  </div>
-                 <p className="font-mono text-sm text-white">KES 56,000</p>
-               </li>
-               <li className="flex justify-between items-end group">
-                 <div>
-                   <p className="font-serif text-xl text-white group-hover:text-[#c2a27c] transition-colors">High Season</p>
-                   <p className="font-mono text-[9px] uppercase tracking-wider text-white/40 mt-1">Jul-Oct, Jan 6-Mar 31</p>
-                 </div>
-                 <p className="font-mono text-sm text-white">KES 65,000</p>
-               </li>
-               <li className="flex justify-between items-end group">
-                 <div>
-                   <p className="font-serif text-xl text-white group-hover:text-[#c2a27c] transition-colors">Festive Season</p>
-                   <p className="font-mono text-[9px] uppercase tracking-wider text-white/40 mt-1">Dec 20 - Jan 5</p>
-                 </div>
-                 <p className="font-mono text-sm text-white">KES 80,000</p>
+                 <p className="font-mono text-sm text-white">${settings?.basePricePerNight || 100} / KES {((settings?.basePricePerNight || 100) * 130).toLocaleString()}</p>
                </li>
              </ul>
            </div>

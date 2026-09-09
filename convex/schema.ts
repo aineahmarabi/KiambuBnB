@@ -16,6 +16,7 @@ export default defineSchema({
     bookingType: v.optional(v.string()), // "stay" or "event"
     eventType: v.optional(v.string()), // e.g. "Wedding", "Party"
     eventGuests: v.optional(v.number()), // For events only
+    paymentStatus: v.optional(v.string()), // "pending", "confirmed"
   }),
   guests: defineTable({
     name: v.string(),
