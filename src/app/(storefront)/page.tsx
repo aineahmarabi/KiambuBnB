@@ -145,7 +145,7 @@ export default function Home() {
             transition={{ duration: 1.5, ease: "easeOut", delay: 0.5 }}
             className="flex flex-col items-center"
           >
-            <div className="mb-6 h-[140px] md:h-[220px] flex items-center justify-center overflow-hidden">
+            <div className="mb-6 h-[180px] md:h-[220px] w-full flex items-center justify-center overflow-hidden px-4">
               <AnimatePresence mode="wait">
                 <motion.h1 
                   key={currentHeadlineIndex}
@@ -153,7 +153,7 @@ export default function Home() {
                   animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
                   exit={{ opacity: 0, y: -15, filter: "blur(4px)" }}
                   transition={{ duration: 1.2, ease: "easeInOut" }}
-                  className="text-5xl md:text-8xl font-serif tracking-tight uppercase font-light text-center text-balance leading-tight m-0"
+                  className="text-4xl sm:text-5xl md:text-7xl lg:text-8xl font-serif tracking-tight uppercase font-light text-center text-balance leading-tight m-0 w-full"
                 >
                   {HEADLINES[currentHeadlineIndex].line1}<br/>{HEADLINES[currentHeadlineIndex].line2}
                 </motion.h1>
