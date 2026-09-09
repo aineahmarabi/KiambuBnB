@@ -29,3 +29,10 @@ export const markAsRead = mutation({
     await ctx.db.patch(args.id, { status: "read" });
   },
 });
+
+export const deleteInquiry = mutation({
+  args: { id: v.id("inquiries") },
+  handler: async (ctx, args) => {
+    await ctx.db.delete(args.id);
+  },
+});

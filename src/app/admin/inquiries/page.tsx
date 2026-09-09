@@ -8,6 +8,7 @@ import { Mail, Send, Trash2 } from "lucide-react";
 export default function InquiriesPage() {
   const inquiries = useQuery(api.inquiries?.getInquiries || (() => []));
   const markAsRead = useMutation(api.inquiries?.markAsRead || (() => Promise.resolve()));
+  const deleteInquiry = useMutation(api.inquiries?.deleteInquiry || (() => Promise.resolve()));
   
   const [selectedId, setSelectedId] = useState<string | null>(null);
 
@@ -18,7 +19,7 @@ export default function InquiriesPage() {
   };
 
   return (
-    <div className="max-w-7xl mx-auto space-y-8 h-[calc(100vh-8rem)] flex flex-col">
+    <div className="max-w-7xl mx-auto w-full flex-1 min-h-0 flex flex-col gap-6 md:gap-8">
       <div>
         <h1 className="font-serif text-4xl md:text-5xl font-light mb-2">Inquiries</h1>
         <p className="font-mono text-xs uppercase tracking-widest text-[#c2a27c]">Communications Inbox</p>
@@ -80,7 +81,16 @@ export default function InquiriesPage() {
                   </div>
                </div>
                <div className="flex gap-2">
-                 <button className="p-3 hover:bg-white/5 text-white/40 hover:text-red-400 rounded-lg transition-colors border border-transparent hover:border-red-400/20" title="Delete">
+                 <button 
+                   onClick={async () => {
+                     if (confirm("Are you sure you want to delete this inquiry?")) {
+                       await deleteInquiry({ id: selectedInquiry._id });
+                       setSelectedId(null);
+                     }
+                   }}
+                   className="p-3 hover:bg-white/5 text-white/40 hover:text-red-400 rounded-lg transition-colors border border-transparent hover:border-red-400/20" 
+                   title="Delete"
+                 >
                    <Trash2 className="w-5 h-5" />
                  </button>
                </div>

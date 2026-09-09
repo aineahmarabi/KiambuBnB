@@ -7,6 +7,45 @@ export const getBookings = query({
   },
 });
 
+export const checkAvailability = query({
+  args: {
+    checkIn: v.number(),
+    checkOut: v.number(),
+  },
+  handler: async (ctx, args) => {
+    const bookings = await ctx.db.query("bookings").collect();
+    
+    // Find any overlapping bookings
+    const overlapping = bookings.filter((b) => 
+      b.status !== "cancelled" && 
+      b.checkIn < args.checkOut && 
+      b.checkOut > args.checkIn
+    );
+
+    if (overlapping.length > 0) {
+      // Basic suggestion logic: find next available 3-day gap
+      const duration = args.checkOut - args.checkIn;
+      let nextAvailableStart = args.checkIn + (24 * 60 * 60 * 1000); // Check tomorrow
+      
+      while (true) {
+        const nextAvailableEnd = nextAvailableStart + duration;
+        const stillOverlapping = bookings.filter((b) => 
+          b.status !== "cancelled" && 
+          b.checkIn < nextAvailableEnd && 
+          b.checkOut > nextAvailableStart
+        );
+        
+        if (stillOverlapping.length === 0) {
+          return { available: false, suggestedArrival: nextAvailableStart, suggestedDeparture: nextAvailableEnd };
+        }
+        nextAvailableStart += (24 * 60 * 60 * 1000);
+      }
+    }
+
+    return { available: true };
+  },
+});
+
 export const createBooking = mutation({
   args: {
     guestName: v.string(),
@@ -22,6 +61,18 @@ export const createBooking = mutation({
     eventGuests: v.optional(v.number()),
   },
   handler: async (ctx, args) => {
+    // PRE-CHECK: Prevent overlapping bookings
+    const allBookings = await ctx.db.query("bookings").collect();
+    const overlapping = allBookings.filter((b) => 
+      b.status !== "cancelled" && 
+      b.checkIn < args.checkOut && 
+      b.checkOut > args.checkIn
+    );
+
+    if (overlapping.length > 0) {
+      throw new Error("Dates unavailable");
+    }
+
     // Determine status (if checkIn is today or past but checkout is future -> hosting, else upcoming)
     const now = Date.now();
     let status = "upcoming";

@@ -143,6 +143,18 @@ body {
 .react-datepicker__day-name, .react-datepicker__day, .react-datepicker__time-name {
   color: rgba(255, 255, 255, 0.5) !important;
 }
+.react-datepicker__time-list-item {
+  color: rgba(255, 255, 255, 0.5) !important;
+  background-color: transparent !important;
+}
+.react-datepicker__time-list-item:hover {
+  background-color: rgba(255, 255, 255, 0.1) !important;
+  color: #fff !important;
+}
+.react-datepicker__time-list-item--selected {
+  background-color: #c2a27c !important;
+  color: #000 !important;
+}
 .react-datepicker__day:hover, .react-datepicker__month-text:hover, .react-datepicker__quarter-text:hover, .react-datepicker__year-text:hover {
   background-color: rgba(255, 255, 255, 0.1) !important;
 }

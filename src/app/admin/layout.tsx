@@ -69,7 +69,10 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
   const inquiries = useQuery(api.inquiries?.getInquiries || (() => []));
   const settings = useQuery(api.settings?.getSettings || (() => null));
+  const bookings = useQuery(api.bookings?.getBookings || (() => []));
+  
   const unreadInquiries = inquiries?.filter((i: any) => i.status === "unread") || [];
+  const upcomingBookings = bookings?.filter((b: any) => b.status === "upcoming") || [];
 
   const navItems = [
     { name: "Overview", href: "/admin", icon: LayoutDashboard },
@@ -139,15 +142,37 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
               <Link 
                 key={item.name}
                 href={item.href} 
-                className={`flex items-center gap-4 px-4 py-3 rounded-lg transition-colors font-light ${
+                className={`relative flex items-center justify-between px-4 py-3 rounded-lg transition-colors font-light ${
                   isActive 
                     ? "bg-[#c2a27c]/10 text-[#c2a27c] border border-[#c2a27c]/20" 
                     : "text-white/60 hover:bg-white/5 hover:text-white"
                 }`}
                 title={isCollapsed ? item.name : ""}
               >
-                <item.icon className={`w-4 h-4 shrink-0 ${isActive ? "text-[#c2a27c]" : "text-white/40"}`} />
-                {!isCollapsed && <span className="text-sm">{item.name}</span>}
+                <div className="flex items-center gap-4">
+                  <item.icon className={`w-4 h-4 shrink-0 ${isActive ? "text-[#c2a27c]" : "text-white/40"}`} />
+                  {!isCollapsed && <span className="text-sm">{item.name}</span>}
+                </div>
+                
+                {/* Number Badges (Expanded) */}
+                {!isCollapsed && item.name === "Inquiries" && unreadInquiries.length > 0 && (
+                  <span className="bg-[#c2a27c] text-black font-mono text-[9px] px-1.5 py-0.5 rounded-sm font-bold">
+                    {unreadInquiries.length}
+                  </span>
+                )}
+                {!isCollapsed && item.name === "Bookings" && upcomingBookings.length > 0 && (
+                  <span className="bg-[#c2a27c] text-black font-mono text-[9px] px-1.5 py-0.5 rounded-sm font-bold">
+                    {upcomingBookings.length}
+                  </span>
+                )}
+
+                {/* Dot Badges (Collapsed) */}
+                {isCollapsed && item.name === "Inquiries" && unreadInquiries.length > 0 && (
+                  <span className="absolute right-2.5 top-2.5 w-1.5 h-1.5 bg-[#c2a27c] rounded-full"></span>
+                )}
+                {isCollapsed && item.name === "Bookings" && upcomingBookings.length > 0 && (
+                  <span className="absolute right-2.5 top-2.5 w-1.5 h-1.5 bg-[#c2a27c] rounded-full"></span>
+                )}
               </Link>
             );
           })}
@@ -255,7 +280,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           {/* Admin Footer */}
           <footer className="mt-12 pt-6 border-t border-white/10 text-center">
             <p className="font-mono text-[10px] tracking-widest text-white/30 uppercase">
-              &copy; {new Date().getFullYear()} The Kiambu BnB. All Rights Reserved.
+              &copy; {new Date().getFullYear()} Ficus & Figs. All Rights Reserved.
             </p>
           </footer>
         </main>

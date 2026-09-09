@@ -11,7 +11,7 @@ TERMS OF SERVICE
 
 Effective Date: September 2026
 
-Welcome to The Kiambu BnB. By accessing our website, booking a stay, or utilizing our services, you agree to be bound by these comprehensive Terms of Service. Please read them carefully, as they govern your relationship with The Kiambu BnB ("we," "us," or "our").
+Welcome to Ficus & Figs. By accessing our website, booking a stay, or utilizing our services, you agree to be bound by these comprehensive Terms of Service. Please read them carefully, as they govern your relationship with Ficus & Figs ("we," "us," or "our").
 
 1. RESERVATIONS, DEPOSITS, AND PAYMENTS
 1.1 Booking Confirmation: All reservations are considered provisional until a non-refundable deposit of 50% of the total booking cost is received and cleared. 
@@ -20,7 +20,7 @@ Welcome to The Kiambu BnB. By accessing our website, booking a stay, or utilizin
 
 2. CANCELLATION AND MODIFICATION POLICY
 2.1 Guest Cancellations: Cancellations made more than 30 days prior to arrival will incur a 20% administrative fee. Cancellations within 14-30 days forfeit the 50% deposit. Cancellations within 14 days of arrival result in a 100% forfeiture of the total booking cost.
-2.2 Force Majeure: The Kiambu BnB shall not be liable for any failure or delay in performing its obligations where such failure or delay results from any cause that is beyond its reasonable control, including acts of God, severe weather, governmental actions, or pandemics.
+2.2 Force Majeure: Ficus & Figs shall not be liable for any failure or delay in performing its obligations where such failure or delay results from any cause that is beyond its reasonable control, including acts of God, severe weather, governmental actions, or pandemics.
 
 3. PROPERTY USE AND HOUSE RULES
 3.1 Occupancy: The maximum occupancy of the estate is strictly limited to the number of guests declared at the time of booking. Unauthorized visitors or overnight guests are not permitted.
@@ -30,10 +30,10 @@ Welcome to The Kiambu BnB. By accessing our website, booking a stay, or utilizin
 4. DAMAGES, LIABILITY, AND SECURITY
 4.1 Security Deposit: A pre-authorization security deposit may be required upon check-in to cover potential incidental damages.
 4.2 Guest Liability: You are fully responsible for the cost of repairing any damage to the property, furnishings, fixtures, or grounds caused by you or any member of your party during your stay.
-4.3 Limitation of Liability: The Kiambu BnB, its owners, and its staff shall not be held liable for any personal injury, loss, damage, or theft of guest property occurring on the premises, except where such injury or loss is caused by our gross negligence.
+4.3 Limitation of Liability: Ficus & Figs, its owners, and its staff shall not be held liable for any personal injury, loss, damage, or theft of guest property occurring on the premises, except where such injury or loss is caused by our gross negligence.
 
 5. INTELLECTUAL PROPERTY
-All content on this website, including but not limited to text, high-resolution photography, branding, and design, is the exclusive intellectual property of The Kiambu BnB and is protected by international copyright laws. Unauthorized reproduction is strictly forbidden.
+All content on this website, including but not limited to text, high-resolution photography, branding, and design, is the exclusive intellectual property of Ficus & Figs and is protected by international copyright laws. Unauthorized reproduction is strictly forbidden.
 
 6. GOVERNING LAW AND DISPUTE RESOLUTION
 These terms shall be governed by and construed in accordance with the laws of the Republic of Kenya. Any disputes arising out of or in connection with these terms shall be subject to the exclusive jurisdiction of the courts of Nairobi, Kenya.
@@ -44,7 +44,7 @@ PRIVACY POLICY
 
 Effective Date: September 2026
 
-The Kiambu BnB ("we," "us," or "our") is deeply committed to protecting your privacy and ensuring the security of your personal data. This Privacy Policy outlines our practices regarding the collection, use, processing, and disclosure of information when you interact with our website or utilize our hospitality services.
+Ficus & Figs ("we," "us," or "our") is deeply committed to protecting your privacy and ensuring the security of your personal data. This Privacy Policy outlines our practices regarding the collection, use, processing, and disclosure of information when you interact with our website or utilize our hospitality services.
 
 1. INFORMATION WE COLLECT
 1.1 Personally Identifiable Information (PII): When you make a reservation, inquire about our services, or subscribe to our communications, we collect personal details including, but not limited to, your full name, email address, physical address, phone number, and passport/identification details (required by local law for lodging).
@@ -53,7 +53,7 @@ The Kiambu BnB ("we," "us," or "our") is deeply committed to protecting your pri
 
 2. HOW WE USE YOUR INFORMATION
 2.1 Service Provision: To process reservations, manage check-ins/check-outs, and provide personalized hospitality services during your stay.
-2.2 Communication: To send you booking confirmations, pre-arrival questionnaires, administrative notices, and, provided you have explicitly opted-in, exclusive promotional offers regarding The Kiambu BnB.
+2.2 Communication: To send you booking confirmations, pre-arrival questionnaires, administrative notices, and, provided you have explicitly opted-in, exclusive promotional offers regarding Ficus & Figs.
 2.3 Compliance and Security: To comply with local regulatory requirements for guest registration and to detect, prevent, and address fraud, security breaches, or technical issues.
 
 3. DATA SHARING AND DISCLOSURE

@@ -8,7 +8,7 @@ import Link from "next/link";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { format, differenceInDays } from "date-fns";
-import { useMutation, useQuery } from "convex/react";
+import { useMutation, useQuery, useConvex } from "convex/react";
 import { api } from "../../../../convex/_generated/api";
 
 const PRIVACY_CONTENT = `
@@ -61,6 +61,9 @@ export default function ReservePage() {
   const [bookingType, setBookingType] = useState<"stay" | "event">("stay");
   const [eventType, setEventType] = useState("Wedding");
   const [eventGuests, setEventGuests] = useState(50);
+
+  const convex = useConvex();
+  const createBooking = useMutation(api.bookings?.createBooking || (() => Promise.resolve()));
   
   const [arrivalDate, setArrivalDate] = useState<Date | null>(new Date());
   const [departureDate, setDepartureDate] = useState<Date | null>(new Date(new Date().getTime() + 24 * 60 * 60 * 1000));
@@ -74,7 +77,6 @@ export default function ReservePage() {
   const [lastName, setLastName] = useState("");
 
   const settings = useQuery(api.settings?.getSettings || (() => null));
-  const createBooking = useMutation(api.bookings?.createBooking || (() => Promise.resolve()));
   
   const KES_RATE = 130;
   const nights = Math.max(1, differenceInDays(departureDate || new Date(), arrivalDate || new Date()));
@@ -88,12 +90,34 @@ export default function ReservePage() {
     return () => clearInterval(interval);
   }, []);
 
-  const handleCheckAvailability = () => {
+  const handleCheckAvailability = async () => {
     setStep("checking");
-    // Simulate checking availability
-    setTimeout(() => {
-        setStep("finalize");
-    }, 1500);
+    
+    try {
+      const result = await convex.query(api.bookings.checkAvailability, {
+        checkIn: (arrivalDate || new Date()).getTime(),
+        checkOut: (departureDate || new Date()).getTime(),
+      });
+      
+      // Artificial delay just to show the checking animation for premium feel
+      setTimeout(() => {
+        if (result.available) {
+          setStep("finalize");
+        } else {
+          if (result.suggestedArrival && result.suggestedDeparture) {
+            setSuggestedDates({
+              arrival: new Date(result.suggestedArrival),
+              departure: new Date(result.suggestedDeparture)
+            });
+          }
+          setStep("conflict");
+        }
+      }, 1000);
+      
+    } catch (e) {
+      console.error(e);
+      setStep("conflict");
+    }
   };
 
   const acceptSuggestion = () => {
@@ -445,6 +469,14 @@ export default function ReservePage() {
                    } catch (error) {
                      console.error("Booking failed:", error);
                      setStep("conflict");
+                     // Generate a valid suggestion if none exists
+                     if (!suggestedDates) {
+                       const nextArrival = new Date(arrivalDate || new Date());
+                       nextArrival.setDate(nextArrival.getDate() + 3);
+                       const nextDeparture = new Date(departureDate || new Date());
+                       nextDeparture.setDate(nextDeparture.getDate() + 3);
+                       setSuggestedDates({ arrival: nextArrival, departure: nextDeparture });
+                     }
                    }
                  }}>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
