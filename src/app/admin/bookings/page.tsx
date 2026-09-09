@@ -31,6 +31,9 @@ export default function BookingsPage() {
     children: 0,
     specialRequests: "",
     totalPrice: 0,
+    bookingType: "stay", // "stay" or "event"
+    eventType: "Wedding",
+    eventGuests: 50,
   });
   
   // Auto-calculate price when dates change
@@ -130,13 +133,16 @@ export default function BookingsPage() {
                     email: formData.email,
                     checkIn: new Date(formData.checkIn).getTime(),
                     checkOut: new Date(formData.checkOut).getTime(),
-                    adults: formData.adults,
-                    children: formData.children,
+                    adults: formData.bookingType === "stay" ? formData.adults : 0,
+                    children: formData.bookingType === "stay" ? formData.children : 0,
                     specialRequests: formData.specialRequests || undefined,
                     totalPrice: formData.totalPrice || undefined,
+                    bookingType: formData.bookingType,
+                    eventType: formData.bookingType === "event" ? formData.eventType : undefined,
+                    eventGuests: formData.bookingType === "event" ? formData.eventGuests : undefined,
                   });
                   setIsModalOpen(false);
-                  setFormData({ guestName: "", email: "", checkIn: "", checkOut: "", adults: 1, children: 0, specialRequests: "", totalPrice: 0 });
+                  setFormData({ guestName: "", email: "", checkIn: "", checkOut: "", adults: 1, children: 0, specialRequests: "", totalPrice: 0, bookingType: "stay", eventType: "Wedding", eventGuests: 50 });
                 } catch (err) {
                   console.error(err);
                 } finally {
@@ -144,6 +150,23 @@ export default function BookingsPage() {
                 }
               }}
             >
+              <div className="flex gap-4 border-b border-white/10 pb-6 mb-6">
+                <button 
+                  type="button" 
+                  onClick={() => setFormData({...formData, bookingType: "stay"})}
+                  className={`flex-1 py-3 text-sm font-mono tracking-widest uppercase transition-colors ${formData.bookingType === "stay" ? "bg-white/10 text-[#c2a27c]" : "bg-black/40 text-white/40 hover:text-white"}`}
+                >
+                  Book your stay
+                </button>
+                <button 
+                  type="button" 
+                  onClick={() => setFormData({...formData, bookingType: "event"})}
+                  className={`flex-1 py-3 text-sm font-mono tracking-widest uppercase transition-colors ${formData.bookingType === "event" ? "bg-white/10 text-[#c2a27c]" : "bg-black/40 text-white/40 hover:text-white"}`}
+                >
+                  Host an Event
+                </button>
+              </div>
+
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
                   <label className="block font-mono text-[10px] uppercase tracking-widest text-white/40 mb-2">Guest Name</label>
@@ -161,14 +184,35 @@ export default function BookingsPage() {
                   <label className="block font-mono text-[10px] uppercase tracking-widest text-white/40 mb-2">Check Out Date</label>
                   <input required type="date" value={formData.checkOut} onChange={e => setFormData({...formData, checkOut: e.target.value})} className="w-full bg-black/40 border border-white/10 rounded-lg p-3 text-sm text-white focus:outline-none focus:border-[#c2a27c]" />
                 </div>
-                <div>
-                  <label className="block font-mono text-[10px] uppercase tracking-widest text-white/40 mb-2">Adults</label>
-                  <input required type="number" min="1" value={formData.adults} onChange={e => setFormData({...formData, adults: parseInt(e.target.value)})} className="w-full bg-black/40 border border-white/10 rounded-lg p-3 text-sm text-white focus:outline-none focus:border-[#c2a27c]" />
-                </div>
-                <div>
-                  <label className="block font-mono text-[10px] uppercase tracking-widest text-white/40 mb-2">Children</label>
-                  <input required type="number" min="0" value={formData.children} onChange={e => setFormData({...formData, children: parseInt(e.target.value)})} className="w-full bg-black/40 border border-white/10 rounded-lg p-3 text-sm text-white focus:outline-none focus:border-[#c2a27c]" />
-                </div>
+                {formData.bookingType === "stay" ? (
+                  <>
+                    <div>
+                      <label className="block font-mono text-[10px] uppercase tracking-widest text-white/40 mb-2">Adults</label>
+                      <input required type="number" min="1" value={formData.adults} onChange={e => setFormData({...formData, adults: parseInt(e.target.value)})} className="w-full bg-black/40 border border-white/10 rounded-lg p-3 text-sm text-white focus:outline-none focus:border-[#c2a27c]" />
+                    </div>
+                    <div>
+                      <label className="block font-mono text-[10px] uppercase tracking-widest text-white/40 mb-2">Children</label>
+                      <input required type="number" min="0" value={formData.children} onChange={e => setFormData({...formData, children: parseInt(e.target.value)})} className="w-full bg-black/40 border border-white/10 rounded-lg p-3 text-sm text-white focus:outline-none focus:border-[#c2a27c]" />
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <div>
+                      <label className="block font-mono text-[10px] uppercase tracking-widest text-[#c2a27c] mb-2">Event Type</label>
+                      <select value={formData.eventType} onChange={e => setFormData({...formData, eventType: e.target.value})} className="w-full bg-black/40 border border-white/10 rounded-lg p-3 text-sm text-[#c2a27c] focus:outline-none focus:border-[#c2a27c] appearance-none">
+                        <option value="Wedding">Wedding</option>
+                        <option value="Party">Private Party</option>
+                        <option value="Corporate">Corporate Retreat</option>
+                        <option value="Picnic">Picnic / Gathering</option>
+                        <option value="Other">Other Event</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label className="block font-mono text-[10px] uppercase tracking-widest text-white/40 mb-2">Estimated Guests</label>
+                      <input required type="number" min="1" value={formData.eventGuests} onChange={e => setFormData({...formData, eventGuests: parseInt(e.target.value)})} className="w-full bg-black/40 border border-white/10 rounded-lg p-3 text-sm text-white focus:outline-none focus:border-[#c2a27c]" />
+                    </div>
+                  </>
+                )}
                 <div className="md:col-span-2">
                   <label className="block font-mono text-[10px] uppercase tracking-widest text-[#c2a27c] mb-2">Total Price (USD / KES)</label>
                   <div className="relative">
@@ -238,7 +282,12 @@ function BookingCard({ booking, onDelete, onUpdateStatus }: { booking: any, onDe
       {/* Details Block */}
       <div className="flex-1 flex flex-col justify-center border-t lg:border-t-0 xl:border-t xl:border-l-0 2xl:border-t-0 lg:border-l 2xl:border-l border-white/10 pt-6 lg:pt-0 xl:pt-6 2xl:pt-0 lg:pl-8 xl:pl-0 2xl:pl-8 pr-12 min-w-0">
         <div className="flex justify-between items-start mb-2 gap-4">
-          <h3 className="text-2xl font-serif text-[#e8e0d4] truncate pr-4">{booking.guestName || "Unknown Guest"}</h3>
+          <div className="flex items-center gap-3">
+            <h3 className="text-2xl font-serif text-[#e8e0d4] truncate">{booking.guestName || "Unknown Guest"}</h3>
+            {booking.bookingType === "event" && (
+              <span className="bg-[#c2a27c] text-black font-mono text-[10px] uppercase tracking-widest px-2 py-0.5 rounded-sm font-bold">Event</span>
+            )}
+          </div>
           <div className="flex flex-col items-end gap-1 shrink-0">
             <span className="font-mono text-[10px] text-white/30 uppercase">ID: {booking.bookingId || booking._id.substring(0,6)}</span>
             {booking.totalPrice !== undefined && (
@@ -247,7 +296,11 @@ function BookingCard({ booking, onDelete, onUpdateStatus }: { booking: any, onDe
           </div>
         </div>
         <div className="flex items-center gap-2 sm:gap-4 text-sm text-white/60 mb-4 font-light flex-wrap sm:flex-nowrap">
-          <span className="shrink-0">{booking.adults} Adults, {booking.children} Children</span>
+          {booking.bookingType === "event" ? (
+             <span className="shrink-0 text-[#c2a27c] font-medium">{booking.eventType} • {booking.eventGuests} Guests</span>
+          ) : (
+             <span className="shrink-0">{booking.adults} Adults, {booking.children} Children</span>
+          )}
           {booking.email && (
             <>
               <span className="hidden sm:inline">•</span>

@@ -13,6 +13,9 @@ export default defineSchema({
     status: v.string(), // "hosting", "upcoming", "past", "cancelled"
     specialRequests: v.optional(v.string()),
     totalPrice: v.optional(v.number()),
+    bookingType: v.optional(v.string()), // "stay" or "event"
+    eventType: v.optional(v.string()), // e.g. "Wedding", "Party"
+    eventGuests: v.optional(v.number()), // For events only
   }),
   guests: defineTable({
     name: v.string(),

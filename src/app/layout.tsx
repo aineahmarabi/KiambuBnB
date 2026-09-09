@@ -26,9 +26,9 @@ const dmMono = DM_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "The Kiambu BnB — Where the Horizon Belongs to You",
+  title: "Ficus and Figs — A Rustic 8-Bedroom Home",
   description:
-    "An eight-bedroom Bed & Breakfast set into the hills of Kiambu, Kenya. Offered by private inquiry.",
+    "A beautiful rustic 8-bedroom home sleeping 16 guests comfortably. Featuring a pool, garden, and perfect for big families, weddings, parties, and picnics.",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

@@ -109,17 +109,17 @@ export function Footer() {
             {/* Left: Info & Links */}
             <div className="md:col-span-7 flex flex-col justify-between py-4 order-2 md:order-1">
               <div>
-                <h3 className="text-5xl md:text-7xl font-serif font-light tracking-tighter mb-8 whitespace-pre-wrap">{settings === undefined ? "\u00A0" : (settings?.propertyName ? settings.propertyName.replace(" ", "\n") + "." : "The Kiambu\nBnB.")}</h3>
+                <h3 className="text-5xl md:text-7xl font-serif font-light tracking-tighter mb-8 whitespace-pre-wrap">{settings === undefined ? "\u00A0" : (settings?.propertyName ? settings.propertyName.replace(" ", "\n") + "." : "Ficus and\nFigs.")}</h3>
 
                 <div className="space-y-4 text-white/70 font-light mt-8">
                   <p className="flex items-center gap-3">
                     <MapPin className="w-4 h-4 text-[#c2a27c]" /> Kiambu Hills, Kenya
                   </p>
-                  <a href={`mailto:${settings?.email || "reservations@kiambubnb.com"}`} className="flex items-center gap-3 hover:text-[#c2a27c] transition-colors w-fit">
-                    <Mail className="w-4 h-4 text-[#c2a27c]" /> {settings?.email || "reservations@kiambubnb.com"}
+                  <a href={`mailto:${settings?.email || "info@ficusandfigs.com"}`} className="flex items-center gap-3 hover:text-[#c2a27c] transition-colors w-fit">
+                    <Mail className="w-4 h-4 text-[#c2a27c]" /> {settings?.email || "info@ficusandfigs.com"}
                   </a>
-                  <a href={`tel:${settings?.phone ? settings.phone.replace(/\\D/g,'') : "+254700000000"}`} className="flex items-center gap-3 hover:text-[#c2a27c] transition-colors w-fit">
-                    <Phone className="w-4 h-4 text-[#c2a27c]" /> {settings?.phone || "+254 700 000 000"}
+                  <a href={`tel:${settings?.phone ? settings.phone.replace(/\D/g,'') : "+254708443090"}`} className="flex items-center gap-3 hover:text-[#c2a27c] transition-colors w-fit">
+                    <Phone className="w-4 h-4 text-[#c2a27c]" /> {settings?.phone || "+254 708 443 090"}
                   </a>
                 </div>
                 
@@ -207,7 +207,7 @@ export function Footer() {
         {/* Copyright & Bottom Spacing */}
         <div className="mt-8 md:mt-12 pt-6 flex items-center justify-center text-center w-full border-t border-white/5 relative z-10">
             <p className="font-mono text-[10px] tracking-[0.2em] text-white/20 uppercase">
-              &copy; {new Date().getFullYear()} The Kiambu BnB. All Rights Reserved.
+              &copy; {new Date().getFullYear()} Ficus and Figs. All Rights Reserved.
             </p>
           </div>
         </div>

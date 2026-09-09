@@ -32,22 +32,22 @@ export function Navigation() {
   return (
     <>
       {/* Floating Elements (No Top Bar) */}
-      <div className="fixed top-0 left-0 w-full z-50 pointer-events-none p-6 md:p-10 flex justify-between items-start mix-blend-difference text-[#e8e0d4]">
+      <div className="fixed top-0 left-0 w-full z-50 pointer-events-none p-6 md:p-10 pt-8 md:pt-12 flex justify-between items-start text-white/90 bg-gradient-to-b from-black/60 via-black/20 to-transparent pb-20">
         
         {/* Hamburger */}
         <button 
           onClick={() => setIsOpen(true)}
-          className="pointer-events-auto flex flex-col gap-[6px] w-8 hover:opacity-70 transition-opacity cursor-pointer"
+          className="pointer-events-auto flex flex-col gap-[6px] w-8 hover:opacity-70 transition-opacity cursor-pointer group"
         >
-          <div className="h-[1px] w-full bg-current"></div>
-          <div className="h-[1px] w-full bg-current"></div>
+          <div className="h-[2px] w-full bg-white/90 group-hover:bg-white transition-colors"></div>
+          <div className="h-[2px] w-full bg-white/90 group-hover:bg-white transition-colors"></div>
         </button>
 
         {/* Centered Title */}
-        <div className="absolute left-1/2 -translate-x-1/2 top-6 md:top-10 pointer-events-auto">
-          <button onClick={() => scrollTo('hero')} className="hover:opacity-70 transition-opacity">
-            <h1 className="font-serif text-xl md:text-3xl tracking-widest uppercase font-light cursor-pointer">
-              {settings?.propertyName || "THE BNB"}
+        <div className="absolute left-1/2 -translate-x-1/2 top-8 md:top-12 pointer-events-auto text-center">
+          <button onClick={() => scrollTo('hero')} className="hover:opacity-70 transition-opacity flex flex-col items-center">
+            <h1 className="font-serif text-xl md:text-2xl tracking-[0.3em] uppercase font-light cursor-pointer leading-tight text-white/90 hover:text-white transition-colors">
+              Ficus & Figs
             </h1>
           </button>
         </div>

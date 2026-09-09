@@ -17,6 +17,9 @@ export const createBooking = mutation({
     checkOut: v.number(),
     specialRequests: v.optional(v.string()),
     totalPrice: v.optional(v.number()),
+    bookingType: v.optional(v.string()),
+    eventType: v.optional(v.string()),
+    eventGuests: v.optional(v.number()),
   },
   handler: async (ctx, args) => {
     // Determine status (if checkIn is today or past but checkout is future -> hosting, else upcoming)

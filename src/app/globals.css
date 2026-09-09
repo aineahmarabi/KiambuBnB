@@ -160,3 +160,39 @@ body {
 .react-datepicker__navigation-icon::before {
   border-color: #c2a27c !important;
 }
+
+@media (max-width: 640px) {
+  .react-datepicker-popper {
+    left: 50% !important;
+    transform: translate(-50%, 10px) !important;
+    width: 90vw !important;
+    max-width: 350px !important;
+  }
+  .react-datepicker {
+    display: flex !important;
+    flex-direction: column;
+    width: 100% !important;
+  }
+  .react-datepicker__month-container {
+    width: 100% !important;
+  }
+  .react-datepicker__time-container {
+    width: 100% !important;
+    border-left: none !important;
+    border-top: 1px solid rgba(255, 255, 255, 0.1) !important;
+  }
+  .react-datepicker__time-list {
+    height: 120px !important;
+    display: flex !important;
+    flex-direction: row !important;
+    overflow-x: auto !important;
+    overflow-y: hidden !important;
+  }
+  .react-datepicker__time-list-item {
+    padding: 10px 20px !important;
+    height: auto !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+  }
+}

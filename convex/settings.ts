@@ -11,10 +11,10 @@ export const getSettings = query({
     // Return default settings if none exist yet
     if (!settings) {
       return {
-        propertyName: "The Kiambu BnB",
-        phone: "+254 712 345 678",
-        whatsapp: "+254 712 345 678",
-        email: "bookings@thekiambubnb.com",
+        propertyName: "Ficus and Figs",
+        phone: "+254 708 443 090",
+        whatsapp: "+254 708 443 090",
+        email: "info@ficusandfigs.com",
         instagram: "",
         facebook: "",
         tiktok: "",

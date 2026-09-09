@@ -6,7 +6,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/dist/ScrollTrigger";
-import { Trees, BedDouble, Bath, Wine, Coffee } from "lucide-react";
+import { Trees, BedDouble, Bath, Wine, Coffee, MapPin, Navigation2 } from "lucide-react";
 import { Footer } from "@/components/Footer";
 
 if (typeof window !== "undefined") {
@@ -104,11 +104,11 @@ export default function Home() {
             transition={{ duration: 1.5, ease: "easeOut", delay: 0.5 }}
             className="flex flex-col items-center"
           >
-            <h1 className="text-6xl md:text-8xl font-serif tracking-tight uppercase font-light text-center mb-6">
-              The Kiambu<br/>BnB
+            <h1 className="text-6xl md:text-8xl font-serif tracking-tight uppercase font-light text-center mb-6 text-balance leading-tight">
+              A Rustic<br/>8-Bedroom Home
             </h1>
             <div className="w-16 h-[1px] bg-[#c2a27c] mb-6"></div>
-            <p className="font-mono tracking-[0.2em] text-[#c2a27c] text-sm uppercase mb-8">A Masterpiece of Tranquility</p>
+            <p className="font-mono tracking-[0.2em] text-[#c2a27c] text-sm uppercase mb-8">Welcome to Ficus & Figs</p>
             <Link 
               href="/reserve"
               className="group relative inline-flex items-center justify-center px-10 py-4"
@@ -126,8 +126,8 @@ export default function Home() {
       <section id="grounds" className="py-24 md:py-40 px-6 md:px-12 max-w-[100rem] mx-auto">
         <div className="text-center mb-20 reveal-item">
           <Trees className="w-8 h-8 mx-auto text-[#c2a27c] mb-6" strokeWidth={1} />
-          <h2 className="text-4xl md:text-6xl font-serif font-light mb-4">Water & Stone</h2>
-          <p className="text-white/60 max-w-2xl mx-auto font-light">Surrounded by ancient trees, the grounds offer a sanctuary of absolute silence. The expansive pool serves as the centerpiece.</p>
+          <h2 className="text-4xl md:text-6xl font-serif font-light mb-4">Space to Breathe</h2>
+          <p className="text-white/60 max-w-2xl mx-auto font-light">Surrounded by nature, our grounds offer a sanctuary of absolute silence. Featuring a beautiful pool, lush garden, and dedicated staff quarters.</p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
@@ -163,7 +163,7 @@ export default function Home() {
           
           <div className="text-center mb-24 reveal-item">
             <BedDouble className="w-8 h-8 mx-auto text-[#c2a27c] mb-6" strokeWidth={1} />
-            <h2 className="text-4xl md:text-6xl font-serif font-light mb-4">Four Sanctuaries</h2>
+            <h2 className="text-4xl md:text-6xl font-serif font-light mb-4">Eight Sanctuaries</h2>
             <p className="font-mono tracking-widest text-[#c2a27c] text-xs uppercase">Uncompromising Comfort</p>
           </div>
 
@@ -195,7 +195,7 @@ export default function Home() {
              <div className="md:col-span-4 flex flex-col justify-between">
                 <div className="backdrop-blur-md bg-white/5 border border-white/10 p-10 rounded-xl reveal-item mb-6">
                    <h3 className="text-3xl font-serif mb-4 text-[#e8e0d4]">Guest Quarters</h3>
-                   <p className="text-white/60 text-sm leading-relaxed">Two additional exquisitely appointed bedrooms providing a serene escape for family or friends.</p>
+                   <p className="text-white/60 text-sm leading-relaxed">Six additional exquisitely appointed bedrooms providing a serene escape. In total, the property sleeps 16 guests comfortably—perfect for a big family.</p>
                 </div>
                 <div className="grid grid-cols-2 gap-6 h-full">
                    <div className="relative overflow-hidden rounded-xl border border-white/5 reveal-item group min-h-[150px]">
@@ -231,7 +231,8 @@ export default function Home() {
       <section id="living" className="py-24 md:py-40 px-6 md:px-12 max-w-[100rem] mx-auto">
         <div className="w-full text-center space-y-8 mb-24 reveal-item">
           <Wine className="w-8 h-8 mx-auto text-[#c2a27c]" strokeWidth={1} />
-          <h2 className="text-4xl md:text-6xl font-serif font-light">Life, Amplified</h2>
+          <h2 className="text-4xl md:text-6xl font-serif font-light mb-4">Gatherings & Events</h2>
+          <p className="font-mono tracking-widest text-[#c2a27c] text-xs uppercase">Weddings • Parties • Picnics</p>
         </div>
         
         <div className="grid grid-cols-1 md:grid-cols-12 gap-6 mb-24">
@@ -240,7 +241,7 @@ export default function Home() {
           </div>
           <div className="md:col-span-5 flex flex-col gap-6">
             <div className="backdrop-blur-md bg-white/5 border border-white/10 p-8 rounded-xl reveal-item">
-               <p className="text-white/70 font-light leading-relaxed">A grand living area bathed in natural light. French doors frame the horizon, blurring the line between inside and out. Parquet floors and plush seating define the space.</p>
+               <p className="text-white/70 font-light leading-relaxed">Whether you are planning a grand family reunion or an unforgettable celebration, Ficus & Figs is the perfect canvas. Our expansive grounds and grand living areas are perfectly equipped to host spectacular weddings, private parties, and elegant picnics under the sun.</p>
             </div>
             <div className="flex-1 relative overflow-hidden rounded-xl border border-white/5 reveal-item group min-h-[250px]">
               <Image src="/images/IMG_9275.JPG.jpeg" alt="Living Room View" fill className="object-cover parallax-image" />
@@ -277,6 +278,46 @@ export default function Home() {
             <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-700">
                <span className="font-serif text-3xl md:text-5xl italic text-white/90">The Courtyard Entrance</span>
             </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ACT VI: Location & Navigation */}
+      <section id="location" className="py-24 md:py-40 px-6 md:px-12 max-w-[100rem] mx-auto">
+        <div className="w-full text-center space-y-8 mb-16 reveal-item">
+          <MapPin className="w-8 h-8 mx-auto text-[#c2a27c]" strokeWidth={1} />
+          <h2 className="text-4xl md:text-6xl font-serif font-light">Find Your Way</h2>
+          <p className="text-white/60 font-light max-w-xl mx-auto">Nestled in the serene landscapes of Kiambu. Our gates are always open for you.</p>
+        </div>
+
+        <div className="w-full aspect-square md:aspect-[21/9] relative overflow-hidden rounded-xl border border-white/10 reveal-item group">
+          {/* Placeholder Map iframe */}
+          <iframe 
+            src="https://maps.google.com/maps?q=Kiambu,Kenya&t=&z=13&ie=UTF8&iwloc=&output=embed" 
+            width="100%" 
+            height="100%" 
+            style={{ border: 0, filter: 'invert(90%) hue-rotate(180deg) contrast(85%)' }} 
+            allowFullScreen 
+            loading="lazy" 
+            referrerPolicy="no-referrer-when-downgrade"
+            className="absolute inset-0 grayscale opacity-70 group-hover:opacity-100 transition-all duration-700"
+          ></iframe>
+          
+          <div className="absolute inset-0 pointer-events-none bg-gradient-to-t from-black/80 via-transparent to-transparent"></div>
+          
+          <div className="absolute bottom-8 left-8 right-8 flex flex-col md:flex-row items-center justify-between gap-6 z-10 pointer-events-auto">
+            <div className="text-center md:text-left">
+              <h3 className="font-serif text-2xl mb-1">Kiambu, Kenya</h3>
+            </div>
+            <a 
+              href="https://www.google.com/maps/dir/?api=1&destination=Kiambu,Kenya" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-3 px-8 py-4 bg-white/10 hover:bg-[#c2a27c] backdrop-blur-md border border-white/20 transition-colors duration-500 rounded-full group/btn cursor-pointer"
+            >
+              <Navigation2 className="w-5 h-5 text-white group-hover/btn:text-black transition-colors" strokeWidth={1.5} />
+              <span className="font-mono text-xs tracking-widest uppercase text-white group-hover/btn:text-black font-bold transition-colors">Navigate Here</span>
+            </a>
           </div>
         </div>
       </section>

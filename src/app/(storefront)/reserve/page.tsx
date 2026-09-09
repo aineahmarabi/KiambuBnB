@@ -1,7 +1,7 @@
 "use client";
 
 import { motion, AnimatePresence } from "framer-motion";
-import { X, ArrowRight, Plus, Minus, Loader2 } from "lucide-react";
+import { X, ArrowRight, Plus, Minus, Loader2, ChevronDown } from "lucide-react";
 import Image from "next/image";
 import { useState, useEffect } from "react";
 import Link from "next/link";
@@ -16,7 +16,7 @@ PRIVACY POLICY
 
 Effective Date: September 2026
 
-The Kiambu BnB ("we," "us," or "our") is deeply committed to protecting your privacy and ensuring the security of your personal data. This Privacy Policy outlines our practices regarding the collection, use, processing, and disclosure of information when you interact with our website or utilize our hospitality services.
+The Ficus and Figs ("we," "us," or "our") is deeply committed to protecting your privacy and ensuring the security of your personal data. This Privacy Policy outlines our practices regarding the collection, use, processing, and disclosure of information when you interact with our website or utilize our hospitality services.
 
 1. INFORMATION WE COLLECT
 1.1 Personally Identifiable Information (PII): When you make a reservation, inquire about our services, or subscribe to our communications, we collect personal details including, but not limited to, your full name, email address, physical address, phone number, and passport/identification details (required by local law for lodging).
@@ -25,7 +25,7 @@ The Kiambu BnB ("we," "us," or "our") is deeply committed to protecting your pri
 
 2. HOW WE USE YOUR INFORMATION
 2.1 Service Provision: To process reservations, manage check-ins/check-outs, and provide personalized hospitality services during your stay.
-2.2 Communication: To send you booking confirmations, pre-arrival questionnaires, administrative notices, and, provided you have explicitly opted-in, exclusive promotional offers regarding The Kiambu BnB.
+2.2 Communication: To send you booking confirmations, pre-arrival questionnaires, administrative notices, and, provided you have explicitly opted-in, exclusive promotional offers regarding Ficus and Figs.
 2.3 Compliance and Security: To comply with local regulatory requirements for guest registration and to detect, prevent, and address fraud, security breaches, or technical issues.
 
 3. DATA SHARING AND DISCLOSURE
@@ -40,7 +40,7 @@ We retain your personal information only for as long as is necessary for the pur
 Our website utilizes cookies and similar tracking technologies to enhance user experience, analyze site traffic, and understand user behavior. You have the right to accept or decline cookies via your browser settings or our integrated Cookie Consent manager.
 
 6. YOUR RIGHTS
-Depending on your jurisdiction (including compliance with GDPR for European citizens), you may have the right to request access to, correction of, or deletion of your personal data held by us. To exercise these rights, please contact our Data Protection Officer at privacy@kiambubnb.com.
+Depending on your jurisdiction (including compliance with GDPR for European citizens), you may have the right to request access to, correction of, or deletion of your personal data held by us. To exercise these rights, please contact our Data Protection Officer at privacy@ficusandfigs.com.
 `;
 
 const slides = [
@@ -58,6 +58,9 @@ export default function ReservePage() {
   const [guestName, setGuestName] = useState("");
   const [email, setEmail] = useState("");
   const [specialRequests, setSpecialRequests] = useState("");
+  const [bookingType, setBookingType] = useState<"stay" | "event">("stay");
+  const [eventType, setEventType] = useState("Wedding");
+  const [eventGuests, setEventGuests] = useState(50);
   
   const [arrivalDate, setArrivalDate] = useState<Date | null>(new Date());
   const [departureDate, setDepartureDate] = useState<Date | null>(new Date(new Date().getTime() + 24 * 60 * 60 * 1000));
@@ -65,6 +68,7 @@ export default function ReservePage() {
   const [step, setStep] = useState<"select" | "checking" | "conflict" | "finalize" | "success">("select");
   const [suggestedDates, setSuggestedDates] = useState<{arrival: Date, departure: Date} | null>(null);
   const [isPrivacyOpen, setIsPrivacyOpen] = useState(false);
+  const [isEventTypeOpen, setIsEventTypeOpen] = useState(false);
   
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
@@ -156,7 +160,7 @@ export default function ReservePage() {
         </div>
 
         {/* Right: The Elite Booking Interface */}
-        <div data-lenis-prevent="true" className={`dark-scrollbar w-full md:w-1/2 h-full pt-24 pb-6 px-6 md:pt-28 md:pb-8 md:px-12 lg:px-24 overscroll-contain relative flex flex-col ${step === "select" ? "overflow-y-hidden" : "overflow-y-auto"}`}>
+        <div data-lenis-prevent="true" className="dark-scrollbar w-full md:w-1/2 h-full pt-24 pb-6 px-6 md:pt-28 md:pb-8 md:px-12 lg:px-24 overscroll-contain relative flex flex-col overflow-y-auto">
           
           <AnimatePresence mode="wait">
             
@@ -164,13 +168,30 @@ export default function ReservePage() {
             {step === "select" && (
               <motion.div key="select" variants={variants} initial="initial" animate="animate" exit="exit" transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }} className="w-full">
                 <div className="mb-6">
-                  <h2 className="text-4xl md:text-5xl lg:text-6xl font-serif font-light mb-4">Your Retreat</h2>
+                  <h2 className="text-4xl md:text-5xl lg:text-6xl font-serif font-light mb-4">Your Reservation</h2>
                   <div className="w-16 h-[1px] bg-[#c2a27c]"></div>
                 </div>
 
+                <div className="flex gap-4 border-b border-white/10 pb-6 mb-8 mt-2">
+                  <button 
+                    type="button" 
+                    onClick={() => setBookingType("stay")}
+                    className={`flex-1 py-4 text-xs md:text-sm font-mono tracking-widest uppercase transition-all duration-300 ${bookingType === "stay" ? "bg-white/10 text-[#c2a27c] border border-white/20" : "bg-black/40 text-white/40 hover:text-white border border-transparent"}`}
+                  >
+                    Book your stay
+                  </button>
+                  <button 
+                    type="button" 
+                    onClick={() => setBookingType("event")}
+                    className={`flex-1 py-4 text-xs md:text-sm font-mono tracking-widest uppercase transition-all duration-300 ${bookingType === "event" ? "bg-white/10 text-[#c2a27c] border border-white/20" : "bg-black/40 text-white/40 hover:text-white border border-transparent"}`}
+                  >
+                    Host an Event
+                  </button>
+                </div>
+
                 <div className="space-y-6">
-                  <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b border-white/10 pb-6 gap-6 sm:gap-4 date-picker-wrapper relative z-50">
-                    <div className="group cursor-pointer">
+                  <div className="flex flex-row justify-between items-center border-b border-white/10 pb-6 gap-2 sm:gap-4 date-picker-wrapper relative z-50">
+                    <div className="group cursor-pointer flex-1">
                       <p className="font-mono text-[10px] tracking-widest text-[#c2a27c] uppercase mb-2">Book In</p>
                       <DatePicker 
                         selected={arrivalDate} 
@@ -185,21 +206,21 @@ export default function ReservePage() {
                         endDate={departureDate}
                         minDate={new Date()}
                         customInput={
-                          <div className="flex items-baseline gap-2">
-                            <span className="text-5xl lg:text-6xl font-serif font-light transition-colors group-hover:text-white">
+                          <div className="flex items-baseline gap-1 sm:gap-2">
+                            <span className="text-4xl sm:text-5xl lg:text-6xl font-serif font-light transition-colors group-hover:text-white">
                               {arrivalDate ? format(arrivalDate, "dd") : "24"}
                             </span>
-                            <span className="text-[10px] font-light text-white/50 uppercase tracking-[0.2em] group-hover:text-white/80 transition-colors leading-tight">
+                            <span className="text-[9px] sm:text-[10px] font-light text-white/50 uppercase tracking-[0.2em] group-hover:text-white/80 transition-colors leading-tight">
                               {arrivalDate ? format(arrivalDate, "MMM") : "Sep"}<br/>
                               {arrivalDate ? format(arrivalDate, "yyyy") : "2026"}<br/>
-                              <span className="text-[#c2a27c] mt-1 block">{arrivalDate ? format(arrivalDate, "h:mm a") : "2:00 PM"}</span>
+                              <span className="text-[#c2a27c] mt-1 block whitespace-nowrap">{arrivalDate ? format(arrivalDate, "h:mm a") : "2:00 PM"}</span>
                             </span>
                           </div>
                         }
                       />
                     </div>
-                    <ArrowRight className="hidden sm:block w-8 h-8 text-white/20 font-light rotate-90 sm:rotate-0" strokeWidth={0.5} />
-                    <div className="group cursor-pointer sm:text-right">
+                    <ArrowRight className="w-5 h-5 sm:w-8 sm:h-8 text-white/20 font-light flex-shrink-0" strokeWidth={0.5} />
+                    <div className="group cursor-pointer text-right flex-1">
                       <p className="font-mono text-[10px] tracking-widest text-[#c2a27c] uppercase mb-2">Check Out</p>
                       <DatePicker 
                         selected={departureDate} 
@@ -214,13 +235,13 @@ export default function ReservePage() {
                         endDate={departureDate}
                         minDate={arrivalDate || new Date()}
                         customInput={
-                          <div className="flex items-baseline gap-2 sm:justify-end">
-                            <span className="text-[10px] font-light text-white/50 uppercase tracking-[0.2em] sm:text-right group-hover:text-white/80 transition-colors text-left leading-tight">
+                          <div className="flex items-baseline gap-1 sm:gap-2 justify-end">
+                            <span className="text-[9px] sm:text-[10px] font-light text-white/50 uppercase tracking-[0.2em] text-right group-hover:text-white/80 transition-colors leading-tight">
                               {departureDate ? format(departureDate, "MMM") : "Sep"}<br/>
                               {departureDate ? format(departureDate, "yyyy") : "2026"}<br/>
-                              <span className="text-[#c2a27c] mt-1 block">{departureDate ? format(departureDate, "h:mm a") : "11:00 AM"}</span>
+                              <span className="text-[#c2a27c] mt-1 block whitespace-nowrap">{departureDate ? format(departureDate, "h:mm a") : "11:00 AM"}</span>
                             </span>
-                            <span className="text-5xl lg:text-6xl font-serif font-light transition-colors group-hover:text-white">
+                            <span className="text-4xl sm:text-5xl lg:text-6xl font-serif font-light transition-colors group-hover:text-white">
                               {departureDate ? format(departureDate, "dd") : "28"}
                             </span>
                           </div>
@@ -229,25 +250,103 @@ export default function ReservePage() {
                     </div>
                   </div>
 
-                  <div className="flex flex-col gap-4 relative z-10">
-                    <div className="flex justify-between items-center pb-4 border-b border-white/5">
-                      <span className="font-serif text-2xl font-light">Adults</span>
-                      <div className="flex items-center gap-6">
-                        <button onClick={() => setAdults(Math.max(1, adults - 1))} className="p-2 text-white/50 hover:text-white transition-colors cursor-pointer"><Minus className="w-4 h-4" strokeWidth={1} /></button>
-                        <span className="font-mono text-xl w-6 text-center">{adults}</span>
-                        <button onClick={() => setAdults(adults + 1)} className="p-2 text-white/50 hover:text-white transition-colors cursor-pointer"><Plus className="w-4 h-4" strokeWidth={1} /></button>
+                  {bookingType === "stay" ? (
+                    <div className="flex flex-col gap-4 relative z-10">
+                      <div className="flex justify-between items-center pb-4 border-b border-white/5">
+                        <span className="font-serif text-2xl font-light">Adults</span>
+                        <div className="flex items-center gap-6">
+                          <button onClick={() => setAdults(Math.max(1, adults - 1))} className="p-2 text-white/50 hover:text-white transition-colors cursor-pointer"><Minus className="w-4 h-4" strokeWidth={1} /></button>
+                          <input 
+                            type="number" 
+                            min="1" 
+                            max={16 - children}
+                            value={adults} 
+                            onChange={(e) => {
+                               let val = parseInt(e.target.value) || 1;
+                               setAdults(Math.max(1, Math.min(16 - children, val)));
+                            }}
+                            className="font-mono text-xl w-12 text-center bg-transparent text-white focus:outline-none border border-transparent focus:border-white/20 rounded-md py-1" 
+                          />
+                          <button onClick={() => setAdults(adults + children < 16 ? adults + 1 : adults)} className="p-2 text-white/50 hover:text-white transition-colors cursor-pointer"><Plus className="w-4 h-4" strokeWidth={1} /></button>
+                        </div>
+                      </div>
+                      
+                      <div className="flex justify-between items-center pb-4 border-b border-white/5">
+                        <span className="font-serif text-2xl font-light">Children</span>
+                        <div className="flex items-center gap-6">
+                          <button onClick={() => setChildren(Math.max(0, children - 1))} className="p-2 text-white/50 hover:text-white transition-colors cursor-pointer"><Minus className="w-4 h-4" strokeWidth={1} /></button>
+                          <input 
+                            type="number" 
+                            min="0" 
+                            max={16 - adults}
+                            value={children} 
+                            onChange={(e) => {
+                               let val = parseInt(e.target.value) || 0;
+                               setChildren(Math.max(0, Math.min(16 - adults, val)));
+                            }}
+                            className="font-mono text-xl w-12 text-center bg-transparent text-white focus:outline-none border border-transparent focus:border-white/20 rounded-md py-1" 
+                          />
+                          <button onClick={() => setChildren(adults + children < 16 ? children + 1 : children)} className="p-2 text-white/50 hover:text-white transition-colors cursor-pointer"><Plus className="w-4 h-4" strokeWidth={1} /></button>
+                        </div>
                       </div>
                     </div>
-                    
-                    <div className="flex justify-between items-center pb-4 border-b border-white/5">
-                      <span className="font-serif text-2xl font-light">Children</span>
-                      <div className="flex items-center gap-6">
-                        <button onClick={() => setChildren(Math.max(0, children - 1))} className="p-2 text-white/50 hover:text-white transition-colors cursor-pointer"><Minus className="w-4 h-4" strokeWidth={1} /></button>
-                        <span className="font-mono text-xl w-6 text-center">{children}</span>
-                        <button onClick={() => setChildren(children + 1)} className="p-2 text-white/50 hover:text-white transition-colors cursor-pointer"><Plus className="w-4 h-4" strokeWidth={1} /></button>
+                  ) : (
+                    <div className="flex flex-col gap-4 relative z-50">
+                      <div className="flex justify-between items-center pb-4 border-b border-white/5 relative z-[60]">
+                        <span className="font-serif text-2xl font-light">Event Type</span>
+                        <div className="relative">
+                           <button 
+                             type="button"
+                             onClick={() => setIsEventTypeOpen(!isEventTypeOpen)}
+                             className="text-right font-serif text-xl font-light text-white hover:text-[#c2a27c] transition-colors flex items-center gap-2 bg-transparent focus:outline-none"
+                           >
+                             {eventType === "Party" ? "Private Party" : eventType === "Corporate" ? "Corporate Retreat" : eventType === "Picnic" ? "Picnic / Gathering" : eventType === "Other" ? "Other Event" : "Wedding"}
+                             <ChevronDown className={`w-4 h-4 transition-transform ${isEventTypeOpen ? "rotate-180" : ""}`} />
+                           </button>
+                           
+                           <AnimatePresence>
+                             {isEventTypeOpen && (
+                               <motion.div 
+                                 initial={{ opacity: 0, y: -10 }}
+                                 animate={{ opacity: 1, y: 0 }}
+                                 exit={{ opacity: 0, y: -10 }}
+                                 className="absolute right-0 top-full mt-4 w-56 bg-[#100f0d] border border-white/10 rounded-xl overflow-hidden shadow-2xl flex flex-col z-[100]"
+                               >
+                                 {["Wedding", "Party", "Corporate", "Picnic", "Other"].map(type => (
+                                   <button 
+                                     key={type}
+                                     type="button"
+                                     onClick={() => { setEventType(type); setIsEventTypeOpen(false); }}
+                                     className={`px-4 py-3 text-right font-serif text-lg hover:bg-white/5 transition-colors border-b border-white/5 last:border-b-0 ${eventType === type ? "text-[#c2a27c]" : "text-white"}`}
+                                   >
+                                     {type === "Party" ? "Private Party" : type === "Corporate" ? "Corporate Retreat" : type === "Picnic" ? "Picnic / Gathering" : type === "Other" ? "Other Event" : "Wedding"}
+                                   </button>
+                                 ))}
+                               </motion.div>
+                             )}
+                           </AnimatePresence>
+                        </div>
+                      </div>
+                      
+                      <div className="flex justify-between items-center pb-4 border-b border-white/5">
+                        <span className="font-serif text-2xl font-light">Estimated Guests</span>
+                        <div className="flex items-center gap-6">
+                          <button onClick={() => setEventGuests(Math.max(1, eventGuests - 5))} className="p-2 text-white/50 hover:text-white transition-colors cursor-pointer"><Minus className="w-4 h-4" strokeWidth={1} /></button>
+                          <input 
+                            type="number" 
+                            min="1" 
+                            value={eventGuests} 
+                            onChange={(e) => {
+                               let val = parseInt(e.target.value) || 1;
+                               setEventGuests(Math.max(1, val));
+                            }}
+                            className="font-mono text-xl w-16 text-center bg-transparent text-white focus:outline-none border border-transparent focus:border-white/20 rounded-md py-1" 
+                          />
+                          <button onClick={() => setEventGuests(eventGuests + 5)} className="p-2 text-white/50 hover:text-white transition-colors cursor-pointer"><Plus className="w-4 h-4" strokeWidth={1} /></button>
+                        </div>
                       </div>
                     </div>
-                  </div>
+                  )}
 
                   <div className="pt-6 relative z-10">
                      <button onClick={handleCheckAvailability} className="relative group w-full flex items-center justify-between p-6 border border-white/10 hover:border-[#c2a27c] transition-colors cursor-pointer overflow-hidden">
@@ -332,12 +431,15 @@ export default function ReservePage() {
                      await createBooking({
                        guestName: `${firstName} ${lastName}`.trim(),
                        email,
-                       adults,
-                       children,
+                       adults: bookingType === "stay" ? adults : 0,
+                       children: bookingType === "stay" ? children : 0,
                        checkIn: (arrivalDate || new Date()).getTime(),
                        checkOut: (departureDate || new Date()).getTime(),
                        specialRequests: specialRequests || undefined,
-                       totalPrice: totalPrice,
+                       totalPrice: bookingType === "stay" ? totalPrice : undefined,
+                       bookingType,
+                       eventType: bookingType === "event" ? eventType : undefined,
+                       eventGuests: bookingType === "event" ? eventGuests : undefined,
                      });
                      setStep("success");
                    } catch (error) {
@@ -354,12 +456,12 @@ export default function ReservePage() {
                     
                     <div className="flex flex-col md:flex-row md:items-center justify-between p-6 bg-white/[0.02] border border-white/10 rounded-xl mt-8">
                       <div>
-                        <p className="font-mono text-[10px] tracking-[0.2em] text-white/50 uppercase mb-1">Total Stay ({nights} Nights)</p>
-                        <p className="text-2xl font-serif text-white">${totalPrice.toLocaleString()}</p>
+                        <p className="font-mono text-[10px] tracking-[0.2em] text-white/50 uppercase mb-1">{bookingType === "stay" ? `Total Stay (${nights} Nights)` : "Event Pricing"}</p>
+                        <p className="text-2xl font-serif text-white">{bookingType === "stay" ? `$${totalPrice.toLocaleString()}` : "To Be Determined"}</p>
                       </div>
                       <div className="text-left md:text-right mt-4 md:mt-0">
-                        <p className="font-mono text-[10px] tracking-[0.2em] text-[#c2a27c] uppercase mb-1">Equivalent</p>
-                        <p className="text-sm font-mono text-[#c2a27c]">KES {totalPriceKES.toLocaleString()}</p>
+                        <p className="font-mono text-[10px] tracking-[0.2em] text-[#c2a27c] uppercase mb-1">{bookingType === "stay" ? "Equivalent" : "Based on Requirements"}</p>
+                        <p className="text-sm font-mono text-[#c2a27c]">{bookingType === "stay" ? `KES ${totalPriceKES.toLocaleString()}` : "Contact for Quote"}</p>
                       </div>
                     </div>
                     
@@ -391,7 +493,7 @@ export default function ReservePage() {
                  <div className="w-20 h-20 rounded-full border border-[#c2a27c] flex items-center justify-center mb-8">
                     <ArrowRight className="w-8 h-8 text-[#c2a27c] -rotate-45" strokeWidth={1} />
                  </div>
-                 <h2 className="text-4xl md:text-5xl font-serif font-light mb-6">Your Retreat<br/>Awaits.</h2>
+                 <h2 className="text-4xl md:text-5xl font-serif font-light mb-6 whitespace-pre-line">{bookingType === "stay" ? "Your Retreat\nAwaits." : "Your Event\nIs Requested."}</h2>
                  <p className="text-white/70 font-light max-w-sm mx-auto mb-12">A confirmation email has been dispatched to your inbox with your itinerary.</p>
                  <Link href="/" className="font-mono text-xs uppercase tracking-widest text-[#c2a27c] hover:text-white transition-colors">
                    Return to Main Site
