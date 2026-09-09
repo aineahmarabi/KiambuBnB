@@ -206,7 +206,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                  </div>
                  <div className="max-h-80 overflow-y-auto dark-scrollbar">
                    {unreadInquiries.length === 0 ? (
-                     <div className="p-8 text-center font-light text-white/40">You're all caught up.</div>
+                     <div className="p-8 text-center font-light text-white/40">You&apos;re all caught up.</div>
                    ) : (
                      unreadInquiries.slice(0, 5).map((inq: any) => (
                        <Link 
