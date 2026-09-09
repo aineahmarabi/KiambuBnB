@@ -214,6 +214,7 @@ export default function ReservePage() {
                 </div>
 
                 <div className="space-y-6">
+                  <p className="text-center font-mono text-[10px] tracking-[0.2em] uppercase text-white/50 w-full mb-2">Please select your date and time</p>
                   <div className="flex flex-row justify-between items-center border-b border-white/10 pb-6 gap-2 sm:gap-4 date-picker-wrapper relative z-50">
                     <div className="group cursor-pointer flex-1">
                       <p className="font-mono text-[10px] tracking-widest text-[#c2a27c] uppercase mb-2">Book In</p>
