@@ -16,7 +16,8 @@ import {
   Bell,
   Search,
   LogOut,
-  Menu
+  Menu,
+  Box
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 
@@ -79,6 +80,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     { name: "Bookings", href: "/admin/bookings", icon: Calendar },
     { name: "Guests", href: "/admin/guests", icon: Users },
     { name: "Inquiries", href: "/admin/inquiries", icon: MessageSquare },
+    { name: "Packages", href: "/admin/packages", icon: Box },
     { name: "Settings", href: "/admin/settings", icon: Settings },
   ];
 

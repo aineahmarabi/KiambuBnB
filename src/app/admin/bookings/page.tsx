@@ -14,8 +14,8 @@ export default function BookingsPage() {
   const now = Date.now();
   const activeBookings = bookings?.filter((b: any) => b.status !== "cancelled" && b.status !== "past") || [];
   
-  const hosting = activeBookings.filter((b: any) => b.checkIn <= now && b.checkOut >= now);
-  const upcoming = activeBookings.filter((b: any) => b.checkIn > now);
+  const hosting = activeBookings.filter((b: any) => b.status === "hosting");
+  const upcoming = activeBookings.filter((b: any) => b.status === "upcoming");
 
   const createBooking = useMutation(api.bookings?.createBooking || (() => Promise.resolve()));
   const confirmPayment = useMutation(api.bookings?.confirmPayment || (() => Promise.resolve()));
@@ -191,11 +191,11 @@ export default function BookingsPage() {
                   <>
                     <div>
                       <label className="block font-mono text-[10px] uppercase tracking-widest text-white/40 mb-2">Adults</label>
-                      <input required type="number" min="1" value={formData.adults} onChange={e => setFormData({...formData, adults: parseInt(e.target.value)})} className="w-full bg-black/40 border border-white/10 rounded-lg p-3 text-sm text-white focus:outline-none focus:border-[#c2a27c]" />
+                      <input required type="number" min="1" value={formData.adults || ""} onChange={e => setFormData({...formData, adults: parseInt(e.target.value) || 1})} className="w-full bg-black/40 border border-white/10 rounded-lg p-3 text-sm text-white focus:outline-none focus:border-[#c2a27c]" />
                     </div>
                     <div>
                       <label className="block font-mono text-[10px] uppercase tracking-widest text-white/40 mb-2">Children</label>
-                      <input required type="number" min="0" value={formData.children} onChange={e => setFormData({...formData, children: parseInt(e.target.value)})} className="w-full bg-black/40 border border-white/10 rounded-lg p-3 text-sm text-white focus:outline-none focus:border-[#c2a27c]" />
+                      <input required type="number" min="0" value={formData.children ?? ""} onChange={e => setFormData({...formData, children: parseInt(e.target.value) || 0})} className="w-full bg-black/40 border border-white/10 rounded-lg p-3 text-sm text-white focus:outline-none focus:border-[#c2a27c]" />
                     </div>
                   </>
                 ) : (
@@ -293,9 +293,9 @@ function BookingCard({ booking, onDelete, onUpdateStatus, onConfirmPayment }: { 
               <span className="bg-[#c2a27c] text-black font-mono text-[10px] uppercase tracking-widest px-2 py-0.5 rounded-sm font-bold">Event</span>
             )}
             {booking.paymentStatus === "pending" ? (
-              <span className="bg-amber-500/20 text-amber-500 border border-amber-500/30 font-mono text-[10px] uppercase tracking-widest px-2 py-0.5 rounded-sm font-bold animate-pulse">Pending Payment</span>
+              <span className="bg-amber-500/20 text-amber-500 border border-amber-500/30 font-mono text-[10px] uppercase tracking-widest px-2 py-0.5 rounded-sm font-bold animate-pulse whitespace-nowrap">Pending Payment</span>
             ) : booking.paymentStatus === "confirmed" ? (
-              <span className="bg-green-500/20 text-green-500 border border-green-500/30 font-mono text-[10px] uppercase tracking-widest px-2 py-0.5 rounded-sm font-bold">Paid</span>
+              <span className="bg-green-500/20 text-green-500 border border-green-500/30 font-mono text-[10px] uppercase tracking-widest px-2 py-0.5 rounded-sm font-bold whitespace-nowrap">Paid</span>
             ) : null}
           </div>
           <div className="flex flex-col items-end gap-1 shrink-0">

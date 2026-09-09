@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Instagram, Facebook, Twitter, Mail, MapPin, Phone } from "lucide-react";
 import { useQuery, useMutation } from "convex/react";
 import { api } from "../../convex/_generated/api";
+import Link from "next/link";
 
 const TOS_CONTENT = `
 TERMS OF SERVICE
@@ -135,6 +136,15 @@ export function Footer() {
                   <a href={settings?.whatsapp ? `https://wa.me/${settings.whatsapp.replace(/\D/g,'')}` : "#"} target="_blank" rel="noopener noreferrer" className="w-12 h-12 rounded-full border border-white/10 flex items-center justify-center hover:bg-white/5 hover:border-[#c2a27c] hover:text-[#c2a27c] transition-all duration-300">
                     <WhatsappIcon className="w-5 h-5" strokeWidth={1.5} />
                   </a>
+                </div>
+
+                <div className="mt-12 flex">
+                  <Link href="/reserve" className="relative group inline-flex items-center justify-center px-6 py-3 cursor-pointer w-fit">
+                    <div className="absolute inset-0 bg-[#c2a27c] skew-x-[-15deg] transition-transform duration-500 group-hover:scale-105"></div>
+                    <span className="relative z-10 text-black font-mono uppercase tracking-[0.2em] text-[10px] font-bold">
+                      Reserve Your Space
+                    </span>
+                  </Link>
                 </div>
               </div>
 

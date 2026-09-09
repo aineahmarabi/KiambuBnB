@@ -311,21 +311,7 @@ export default function SettingsPage() {
               </div>
             </label>
 
-            <div className="p-6 bg-white/[0.02] border border-white/10 rounded-xl">
-              <label className="block font-mono text-[10px] uppercase tracking-widest text-white/40 mb-3">Base Price Per Night (USD / KES)</label>
-              <div className="relative">
-                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-white/40 font-mono">$</span>
-                <input 
-                  type="number" 
-                  min="0"
-                  step="1"
-                  value={formData.basePricePerNight}
-                  onChange={(e) => setFormData({...formData, basePricePerNight: Number(e.target.value)})}
-                  className="w-full pl-10 pr-4 py-3 bg-black/40 border border-white/10 rounded-lg text-white font-light focus:outline-none focus:border-[#c2a27c] transition-colors" 
-                />
-              </div>
-              <p className="text-xs text-white/40 mt-3 font-light">This is the default nightly rate used to auto-calculate guest total prices when creating a new booking. (≈ KES {(formData.basePricePerNight * 130).toLocaleString()})</p>
-            </div>
+
           </div>
         </div>
 

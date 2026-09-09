@@ -19,9 +19,29 @@ const HERO_IMAGES = [
   "/images/IMG_9259.JPG.jpeg"
 ];
 
+const HEADLINES = [
+  { line1: "A Rustic", line2: "8-Bedroom Home" },
+  { line1: "An Exclusive", line2: "Event Venue" },
+  { line1: "The Ultimate", line2: "Bridal Pick-Up" },
+  { line1: "A Sanctuary For", line2: "Family Getaways" },
+  { line1: "An Inspiring", line2: "Corporate Retreat" },
+  { line1: "Sun-Drenched Days", line2: "By The Pool" },
+  { line1: "Lush Gardens For", line2: "Timeless Memories" }
+];
+
 export default function Home() {
   const containerRef = useRef<HTMLDivElement>(null);
   const [currentHeroIndex, setCurrentHeroIndex] = useState(0);
+  const [currentHeadlineIndex, setCurrentHeadlineIndex] = useState(0);
+  const [cycleCount, setCycleCount] = useState(0);
+
+  // Load initial cycle count from session storage on mount
+  useEffect(() => {
+    const savedCount = sessionStorage.getItem("heroCycleCount");
+    if (savedCount) {
+      setCycleCount(parseInt(savedCount, 10));
+    }
+  }, []);
   
   useEffect(() => {
     const timer = setInterval(() => {
@@ -29,6 +49,27 @@ export default function Home() {
     }, 6000);
     return () => clearInterval(timer);
   }, []);
+
+  useEffect(() => {
+    if (cycleCount >= 2) return; // Stop cycling after 2 complete phases
+
+    const delay = currentHeadlineIndex === 0 ? 12000 : 5000;
+    const headlineTimer = setTimeout(() => {
+      setCurrentHeadlineIndex((prev) => {
+        const nextIndex = (prev + 1) % HEADLINES.length;
+        if (nextIndex === 0) {
+          setCycleCount(c => {
+            const newCount = c + 1;
+            sessionStorage.setItem("heroCycleCount", newCount.toString());
+            return newCount;
+          });
+        }
+        return nextIndex;
+      });
+    }, delay);
+    
+    return () => clearTimeout(headlineTimer);
+  }, [currentHeadlineIndex, cycleCount]);
 
   useEffect(() => {
     let ctx = gsap.context(() => {
@@ -104,9 +145,20 @@ export default function Home() {
             transition={{ duration: 1.5, ease: "easeOut", delay: 0.5 }}
             className="flex flex-col items-center"
           >
-            <h1 className="text-6xl md:text-8xl font-serif tracking-tight uppercase font-light text-center mb-6 text-balance leading-tight">
-              A Rustic<br/>8-Bedroom Home
-            </h1>
+            <div className="mb-6 h-[140px] md:h-[220px] flex items-center justify-center overflow-hidden">
+              <AnimatePresence mode="wait">
+                <motion.h1 
+                  key={currentHeadlineIndex}
+                  initial={{ opacity: 0, y: 15, filter: "blur(4px)" }}
+                  animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+                  exit={{ opacity: 0, y: -15, filter: "blur(4px)" }}
+                  transition={{ duration: 1.2, ease: "easeInOut" }}
+                  className="text-5xl md:text-8xl font-serif tracking-tight uppercase font-light text-center text-balance leading-tight m-0"
+                >
+                  {HEADLINES[currentHeadlineIndex].line1}<br/>{HEADLINES[currentHeadlineIndex].line2}
+                </motion.h1>
+              </AnimatePresence>
+            </div>
             <div className="w-16 h-[1px] bg-[#c2a27c] mb-6"></div>
             <p className="font-mono tracking-[0.2em] text-[#c2a27c] text-sm uppercase mb-8">Welcome to Ficus & Figs</p>
             <Link 

@@ -50,4 +50,11 @@ export default defineSchema({
     maintenanceMode: v.boolean(),
     basePricePerNight: v.optional(v.number()),
   }),
+  packages: defineTable({
+    title: v.string(),
+    category: v.string(), // "Bridal Pick-Up Home" or "Event Venue Rental"
+    description: v.string(),
+    priceKES: v.number(),
+    isActive: v.boolean(),
+  }),
 });

@@ -1,7 +1,7 @@
 "use client";
 
 import { motion, AnimatePresence } from "framer-motion";
-import { X, ArrowRight, Plus, Minus, Loader2, ChevronDown, ChevronLeft, ChevronRight } from "lucide-react";
+import { X, ArrowRight, Plus, Minus, Loader2, ChevronDown, ChevronLeft, ChevronRight, Copy, Check } from "lucide-react";
 import Image from "next/image";
 import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
@@ -59,10 +59,12 @@ export default function ReservePage() {
   const [children, setChildren] = useState(0);
   const [currentSlide, setCurrentSlide] = useState(0);
   const [guestName, setGuestName] = useState("");
-  const [email, setEmail] = useState("");
+  const packages = useQuery(api.packages?.getPackages || (() => []));
+
+  const [dateError, setDateError] = useState("");
   const [specialRequests, setSpecialRequests] = useState("");
   const [bookingType, setBookingType] = useState<"stay" | "event">("stay");
-  const [eventType, setEventType] = useState("Wedding");
+  const [eventType, setEventType] = useState("Venue Rental");
   const [eventGuests, setEventGuests] = useState(50);
 
   const convex = useConvex();
@@ -78,6 +80,19 @@ export default function ReservePage() {
   const [isRatesOpen, setIsRatesOpen] = useState(false);
   const [fullName, setFullName] = useState("");
   const [mounted, setMounted] = useState(false);
+  const [copiedMpesa, setCopiedMpesa] = useState(false);
+  const [copiedEquity, setCopiedEquity] = useState(false);
+
+  const handleCopy = (text: string, type: "mpesa" | "equity") => {
+    navigator.clipboard.writeText(text);
+    if (type === "mpesa") {
+      setCopiedMpesa(true);
+      setTimeout(() => setCopiedMpesa(false), 2000);
+    } else {
+      setCopiedEquity(true);
+      setTimeout(() => setCopiedEquity(false), 2000);
+    }
+  };
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -103,14 +118,30 @@ export default function ReservePage() {
   const KES_RATE = 130;
   const nights = Math.max(1, differenceInDays(departureDate || new Date(), arrivalDate || new Date()));
   
+  const getSeasonRate = (date: Date) => {
+    const month = date.getMonth(); 
+    const day = date.getDate();
+    if ((month === 11 && day >= 20) || (month === 0 && day <= 5)) return 80000;
+    if ((month >= 6 && month <= 9) || (month === 0 && day > 5) || month === 1 || month === 2) return 65000;
+    return 56000;
+  };
+
   let calculatedPriceKES = 0;
   if (bookingType === "stay") {
-    const basePriceUSD = settings?.basePricePerNight || 100;
-    calculatedPriceKES = basePriceUSD * KES_RATE * nights;
+    let currentDate = new Date(arrivalDate || new Date());
+    for (let i = 0; i < nights; i++) {
+      calculatedPriceKES += getSeasonRate(currentDate);
+      currentDate.setDate(currentDate.getDate() + 1);
+    }
   } else {
-    if (eventGuests <= 100) calculatedPriceKES = 50000;
-    else if (eventGuests >= 200) calculatedPriceKES = 100000;
-    else calculatedPriceKES = 70000;
+    if (eventType.includes("Separate Day")) {
+      calculatedPriceKES = 150000;
+    } else {
+      const selectedPkg = packages?.find((p: any) => p.title === eventType);
+      if (selectedPkg) {
+        calculatedPriceKES = selectedPkg.priceKES;
+      }
+    }
   }
 
   const totalPriceKES = calculatedPriceKES;
@@ -361,58 +392,44 @@ export default function ReservePage() {
                       </div>
                     </div>
                   ) : (
-                    <div className="flex flex-col gap-4 relative z-50">
-                      <div className="flex justify-between items-center pb-4 border-b border-white/5 relative z-[60]">
-                        <span className="font-serif text-2xl font-light">Event Type</span>
-                        <div className="relative">
-                           <button 
-                             type="button"
-                             onClick={() => setIsEventTypeOpen(!isEventTypeOpen)}
-                             className="text-right font-serif text-xl font-light text-white hover:text-[#c2a27c] transition-colors flex items-center gap-2 bg-transparent focus:outline-none"
-                           >
-                             {eventType === "Party" ? "Private Party" : eventType === "Corporate" ? "Corporate Retreat" : eventType === "Picnic" ? "Picnic / Gathering" : eventType === "Other" ? "Other Event" : "Wedding"}
-                             <ChevronDown className={`w-4 h-4 transition-transform ${isEventTypeOpen ? "rotate-180" : ""}`} />
-                           </button>
-                           
-                           <AnimatePresence>
-                             {isEventTypeOpen && (
-                               <motion.div 
-                                 initial={{ opacity: 0, y: -10 }}
-                                 animate={{ opacity: 1, y: 0 }}
-                                 exit={{ opacity: 0, y: -10 }}
-                                 className="absolute right-0 top-full mt-4 w-56 bg-[#100f0d] border border-white/10 rounded-xl overflow-hidden shadow-2xl flex flex-col z-[100]"
-                               >
-                                 {["Wedding", "Party", "Corporate", "Picnic", "Other"].map(type => (
-                                   <button 
-                                     key={type}
-                                     type="button"
-                                     onClick={() => { setEventType(type); setIsEventTypeOpen(false); }}
-                                     className={`px-4 py-3 text-right font-serif text-lg hover:bg-white/5 transition-colors border-b border-white/5 last:border-b-0 ${eventType === type ? "text-[#c2a27c]" : "text-white"}`}
-                                   >
-                                     {type === "Party" ? "Private Party" : type === "Corporate" ? "Corporate Retreat" : type === "Picnic" ? "Picnic / Gathering" : type === "Other" ? "Other Event" : "Wedding"}
-                                   </button>
-                                 ))}
-                               </motion.div>
-                             )}
-                           </AnimatePresence>
+                    <div className="flex flex-col gap-8 relative z-50">
+                      <div>
+                        <h4 className="font-mono text-xs uppercase tracking-[0.2em] text-[#c2a27c] mb-4">Bridal Pick-Up Home</h4>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          {packages?.filter((p: any) => p.category === "Bridal Pick-Up Home" && p.isActive).map((pkg: any) => (
+                            <button
+                              key={pkg._id}
+                              type="button"
+                              onClick={() => setEventType(pkg.title)}
+                              className={`p-4 text-left border rounded-xl transition-all duration-300 ${eventType === pkg.title ? "border-[#c2a27c] bg-[#c2a27c]/10" : "border-white/10 hover:border-white/30 bg-black/20"}`}
+                            >
+                              <div className="flex justify-between items-start mb-2">
+                                <p className={`font-serif text-xl ${eventType === pkg.title ? "text-[#c2a27c]" : "text-white"}`}>{pkg.title}</p>
+                              </div>
+                              <p className="text-sm font-light text-white/50 mb-2">{pkg.description}</p>
+                              <p className="font-mono text-xs text-white">KES {pkg.priceKES.toLocaleString()}</p>
+                            </button>
+                          ))}
                         </div>
                       </div>
-                      
-                      <div className="flex justify-between items-center pb-4 border-b border-white/5">
-                        <span className="font-serif text-2xl font-light">Estimated Guests</span>
-                        <div className="flex items-center gap-6">
-                          <button onClick={() => setEventGuests(Math.max(1, eventGuests - 5))} className="p-2 text-white/50 hover:text-white transition-colors cursor-pointer"><Minus className="w-4 h-4" strokeWidth={1} /></button>
-                          <input 
-                            type="number" 
-                            min="1" 
-                            value={eventGuests} 
-                            onChange={(e) => {
-                               let val = parseInt(e.target.value) || 1;
-                               setEventGuests(Math.max(1, val));
-                            }}
-                            className="font-mono text-xl w-16 text-center bg-transparent text-white focus:outline-none border border-transparent focus:border-white/20 rounded-md py-1" 
-                          />
-                          <button onClick={() => setEventGuests(eventGuests + 5)} className="p-2 text-white/50 hover:text-white transition-colors cursor-pointer"><Plus className="w-4 h-4" strokeWidth={1} /></button>
+
+                      <div>
+                        <h4 className="font-mono text-xs uppercase tracking-[0.2em] text-[#c2a27c] mb-4">Event Venue Rental</h4>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                          {packages?.filter((p: any) => p.category === "Event Venue Rental" && p.isActive).map((pkg: any) => (
+                            <button
+                              key={pkg._id}
+                              type="button"
+                              onClick={() => setEventType(pkg.title)}
+                              className={`p-4 text-left border rounded-xl transition-all duration-300 ${eventType === pkg.title ? "border-[#c2a27c] bg-[#c2a27c]/10" : "border-white/10 hover:border-white/30 bg-black/20"}`}
+                            >
+                              <div className="flex justify-between items-start mb-2">
+                                <p className={`font-serif text-lg ${eventType === pkg.title ? "text-[#c2a27c]" : "text-white"}`}>{pkg.title}</p>
+                              </div>
+                              <p className="text-sm font-light text-white/50 mb-2">{pkg.description}</p>
+                              <p className="font-mono text-xs text-white">KES {pkg.priceKES.toLocaleString()}</p>
+                            </button>
+                          ))}
                         </div>
                       </div>
                     </div>
@@ -589,7 +606,7 @@ export default function ReservePage() {
                    <div className="inline-flex items-center gap-4 mb-4">
                      <p className="font-mono text-[10px] tracking-[0.2em] text-[#c2a27c] uppercase">Secure Your Booking</p>
                    </div>
-                   <h2 className="text-4xl md:text-5xl font-serif font-light mb-4">Manual Payment</h2>
+                   <h2 className="text-4xl md:text-5xl font-serif font-light mb-4">Payment Details</h2>
                    <p className="text-white/70 font-light text-sm">Please complete your payment using one of the methods below to secure your dates. A confirmation email has been sent.</p>
                  </div>
 
@@ -600,7 +617,10 @@ export default function ReservePage() {
                      <div className="space-y-2 font-light">
                        <div className="flex justify-between items-center border-b border-white/5 pb-2">
                          <span className="text-white/50 text-sm">Phone Number</span>
-                         <span className="font-mono text-sm tracking-wider">0708443090</span>
+                         <button onClick={() => handleCopy("0708443090", "mpesa")} className="flex items-center gap-2 hover:text-[#c2a27c] transition-colors cursor-pointer group/copy">
+                           <span className="font-mono text-sm tracking-wider">0708443090</span>
+                           {copiedMpesa ? <Check className="w-4 h-4 text-green-500" /> : <Copy className="w-4 h-4 text-white/20 group-hover/copy:text-[#c2a27c]" />}
+                         </button>
                        </div>
                        <div className="flex justify-between items-center pt-2">
                          <span className="text-white/50 text-sm">Account Name</span>
@@ -615,7 +635,10 @@ export default function ReservePage() {
                      <div className="space-y-2 font-light">
                        <div className="flex justify-between items-center border-b border-white/5 pb-2">
                          <span className="text-white/50 text-sm">Account Number</span>
-                         <span className="font-mono text-sm tracking-wider">0590163474798</span>
+                         <button onClick={() => handleCopy("0590163474798", "equity")} className="flex items-center gap-2 hover:text-[#c2a27c] transition-colors cursor-pointer group/copy">
+                           <span className="font-mono text-sm tracking-wider">0590163474798</span>
+                           {copiedEquity ? <Check className="w-4 h-4 text-green-500" /> : <Copy className="w-4 h-4 text-white/20 group-hover/copy:text-[#c2a27c]" />}
+                         </button>
                        </div>
                        <div className="flex justify-between items-center pt-2">
                          <span className="text-white/50 text-sm">Account Name</span>
@@ -625,8 +648,8 @@ export default function ReservePage() {
                    </div>
                  </div>
 
-                 <button onClick={() => setStep("success")} className="w-full h-16 border border-[#c2a27c] text-[#c2a27c] hover:bg-[#c2a27c] hover:text-black transition-all duration-300 font-mono text-[10px] tracking-[0.2em] uppercase cursor-pointer">
-                    I Have Paid
+                 <button onClick={() => setStep("success")} className="w-full h-16 bg-[#c2a27c] text-black hover:bg-white transition-colors duration-300 font-mono text-[10px] tracking-[0.2em] uppercase cursor-pointer shrink-0 mt-4 mb-8">
+                    Payment Completed
                  </button>
               </motion.div>
             )}
@@ -676,43 +699,59 @@ export default function ReservePage() {
              <ul className="space-y-6">
                <li className="flex justify-between items-end group">
                  <div>
-                   <p className="font-serif text-xl text-white group-hover:text-[#c2a27c] transition-colors">Standard Rate</p>
-                   <p className="font-mono text-[9px] uppercase tracking-wider text-white/40 mt-1">Year-Round</p>
+                   <p className="font-serif text-xl text-white group-hover:text-[#c2a27c] transition-colors">Low Season</p>
+                   <p className="font-mono text-[9px] uppercase tracking-wider text-white/40 mt-1">Apr-Jun, Nov-Dec 19</p>
                  </div>
-                 <p className="font-mono text-sm text-white">${settings?.basePricePerNight || 100} / KES {((settings?.basePricePerNight || 100) * 130).toLocaleString()}</p>
+                 <p className="font-mono text-sm text-white">KES 56,000</p>
+               </li>
+               <li className="flex justify-between items-end group">
+                 <div>
+                   <p className="font-serif text-xl text-white group-hover:text-[#c2a27c] transition-colors">High Season</p>
+                   <p className="font-mono text-[9px] uppercase tracking-wider text-white/40 mt-1">Jul-Oct, Jan 6-Mar 31</p>
+                 </div>
+                 <p className="font-mono text-sm text-white">KES 65,000</p>
+               </li>
+               <li className="flex justify-between items-end group">
+                 <div>
+                   <p className="font-serif text-xl text-white group-hover:text-[#c2a27c] transition-colors">Festive Season</p>
+                   <p className="font-mono text-[9px] uppercase tracking-wider text-white/40 mt-1">Dec 20 - Jan 5</p>
+                 </div>
+                 <p className="font-mono text-sm text-white">KES 80,000</p>
                </li>
              </ul>
            </div>
            <div>
              <h3 className="font-mono text-xs uppercase tracking-[0.2em] text-[#c2a27c] mb-6 border-b border-white/10 pb-4 flex items-center gap-2">
-               <span>Weddings & Events</span>
+               <span>Bridal Pick-Up Home</span>
              </h3>
              <ul className="space-y-6">
-               <li className="flex justify-between items-end group">
-                 <div>
-                   <p className="font-serif text-xl text-white group-hover:text-[#c2a27c] transition-colors">Intimate</p>
-                   <p className="font-mono text-[9px] uppercase tracking-wider text-white/40 mt-1">Up to 100 Guests</p>
-                 </div>
-                 <p className="font-mono text-sm text-white">KES 50,000</p>
-               </li>
-               <li className="flex justify-between items-end group">
-                 <div>
-                   <p className="font-serif text-xl text-white group-hover:text-[#c2a27c] transition-colors">Standard</p>
-                   <p className="font-mono text-[9px] uppercase tracking-wider text-white/40 mt-1">101 - 199 Guests</p>
-                 </div>
-                 <p className="font-mono text-sm text-white">KES 70,000</p>
-               </li>
-               <li className="flex justify-between items-end group">
-                 <div>
-                   <p className="font-serif text-xl text-white group-hover:text-[#c2a27c] transition-colors">Grand</p>
-                   <p className="font-mono text-[9px] uppercase tracking-wider text-white/40 mt-1">200 - 500 Guests</p>
-                 </div>
-                 <p className="font-mono text-sm text-white">KES 100,000</p>
-               </li>
+               {packages?.filter((p: any) => p.category === "Bridal Pick-Up Home" && p.isActive).map((pkg: any) => (
+                 <li key={pkg._id} className="flex justify-between items-end group">
+                   <div>
+                     <p className="font-serif text-lg text-white group-hover:text-[#c2a27c] transition-colors">{pkg.title}</p>
+                     <p className="font-mono text-[9px] uppercase tracking-wider text-white/40 mt-1">{pkg.description}</p>
+                   </div>
+                   <p className="font-mono text-sm text-white">KES {pkg.priceKES.toLocaleString()}</p>
+                 </li>
+               ))}
              </ul>
-             <div className="mt-8 p-4 bg-[#c2a27c]/5 border border-[#c2a27c]/10 rounded-md">
-               <p className="font-mono text-[9px] text-[#c2a27c]/80 uppercase leading-relaxed text-center">Event rates apply to grounds rental only.</p>
-             </div>
+           </div>
+           
+           <div>
+             <h3 className="font-mono text-xs uppercase tracking-[0.2em] text-[#c2a27c] mb-6 border-b border-white/10 pb-4 flex items-center gap-2">
+               <span>Event Venue Rental</span>
+             </h3>
+             <ul className="space-y-6">
+               {packages?.filter((p: any) => p.category === "Event Venue Rental" && p.isActive).map((pkg: any) => (
+                 <li key={pkg._id} className="flex justify-between items-end group">
+                   <div>
+                     <p className="font-serif text-lg text-white group-hover:text-[#c2a27c] transition-colors">{pkg.title}</p>
+                     <p className="font-mono text-[9px] uppercase tracking-wider text-white/40 mt-1">{pkg.description}</p>
+                   </div>
+                   <p className="font-mono text-sm text-white">KES {pkg.priceKES.toLocaleString()}</p>
+                 </li>
+               ))}
+             </ul>
            </div>
         </div>
       </div>
