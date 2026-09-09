@@ -1,36 +1,81 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# The Kiambu BnB
 
-## Getting Started
+A premium, ultra-modern booking and property management platform built for **The Kiambu BnB**. 
 
-First, run the development server:
+Designed with a focus on immersive aesthetics, high-end user experience, and robust admin controls, this application allows guests to explore the property, make reservations, and allows administrators to effortlessly manage bookings and inquiries in real-time.
 
+## ✨ Features
+
+### Storefront (Guest Experience)
+- **Immersive Design**: A stunning, high-contrast, dark-mode aesthetic utilizing glassmorphism, micro-animations, and parallax scrolling to create a premium feel.
+- **Dynamic Reservation System**: Guests can easily select dates, verify availability, and secure their booking. 
+- **Real-Time Currency Conversion**: Displays pricing in both USD and local KES equivalent dynamically.
+- **Interactive UI**: Powered by GSAP and Framer Motion for buttery-smooth page transitions, reveals, and interactive elements.
+- **Responsive Navigation**: A sleek, full-screen overlay sidebar for easy navigation on any device.
+
+### Admin Dashboard (Property Management)
+- **Secure Access**: A custom, passcode-protected lock screen restricting access to the dashboard.
+- **Live Ledger**: Real-time management of Bookings, Guests, and Inquiries via Convex.
+- **Property Controls**: Administrators can toggle whether the property is accepting new bookings and instantly update the base price per night.
+- **Automated Calculations**: Calculates total stay costs dynamically based on the current base price and length of stay.
+
+## 🛠️ Tech Stack
+
+- **Framework**: [Next.js 15](https://nextjs.org/) (App Router, React 19)
+- **Styling**: [Tailwind CSS](https://tailwindcss.com/)
+- **Animations**: [Framer Motion](https://www.framer.com/motion/) & [GSAP](https://gsap.com/)
+- **Backend & Database**: [Convex](https://www.convex.dev/) (Serverless, Real-time Database)
+- **Icons**: [Lucide React](https://lucide.dev/)
+- **Date Picking**: React Datepicker
+- **Language**: TypeScript
+
+## 🚀 Getting Started
+
+### Prerequisites
+Make sure you have [Node.js](https://nodejs.org/) installed on your machine.
+
+### 1. Clone the repository
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+git clone https://github.com/aineahmarabi/KiambuBnB.git
+cd KiambuBnB
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### 2. Install dependencies
+```bash
+npm install
+```
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### 3. Setup Environment Variables
+Create a `.env.local` file in the root directory and add the following variables:
+```env
+# Your Convex Deployment URL (Provided when you run `npx convex dev`)
+NEXT_PUBLIC_CONVEX_URL=your_convex_url
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+# The master PIN used to access the Admin Dashboard
+ADMIN_PASSCODE=14328 
+```
 
-## Learn More
+### 4. Run the Development Server & Database
+Start the Convex backend and the Next.js frontend simultaneously:
+```bash
+npm run dev
+```
+Open [http://localhost:3000](http://localhost:3000) to view the storefront, or [http://localhost:3000/admin](http://localhost:3000/admin) to access the dashboard.
 
-To learn more about Next.js, take a look at the following resources:
+## 📦 Deployment (Vercel)
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+This project is optimized for deployment on [Vercel](https://vercel.com/). 
+When deploying, ensure you add the following Environment Variables in your Vercel project settings:
+- `NEXT_PUBLIC_CONVEX_URL`
+- `CONVEX_DEPLOYMENT`
+- `ADMIN_PASSCODE`
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## 🧹 Database Management
 
-## Deploy on Vercel
+If you need to completely wipe the database of all bookings, guests, and inquiries for a fresh start, you can run the built-in Convex wipe script:
+```bash
+npx convex run wipe:all
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+---
+*Built with precision for The Kiambu BnB.*
