@@ -1,9 +1,9 @@
 "use client";
 
 import { motion, AnimatePresence } from "framer-motion";
-import { X, ArrowRight, Plus, Minus, Loader2, ChevronDown } from "lucide-react";
+import { X, ArrowRight, Plus, Minus, Loader2, ChevronDown, ChevronLeft, ChevronRight } from "lucide-react";
 import Image from "next/image";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
@@ -52,6 +52,8 @@ const slides = [
 ];
 
 export default function ReservePage() {
+  const drawerRef = useRef<HTMLDivElement>(null);
+
   const [adults, setAdults] = useState(1);
   const [children, setChildren] = useState(0);
   const [currentSlide, setCurrentSlide] = useState(0);
@@ -72,15 +74,54 @@ export default function ReservePage() {
   const [suggestedDates, setSuggestedDates] = useState<{arrival: Date, departure: Date} | null>(null);
   const [isPrivacyOpen, setIsPrivacyOpen] = useState(false);
   const [isEventTypeOpen, setIsEventTypeOpen] = useState(false);
-  
+  const [isRatesOpen, setIsRatesOpen] = useState(false);
   const [fullName, setFullName] = useState("");
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (drawerRef.current && !drawerRef.current.contains(event.target as Node)) {
+        setIsRatesOpen(false);
+      }
+    }
+    if (isRatesOpen) {
+      document.addEventListener("mousedown", handleClickOutside);
+    }
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [isRatesOpen]);
+  
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const settings = useQuery(api.settings?.getSettings || (() => null));
   
   const KES_RATE = 130;
   const nights = Math.max(1, differenceInDays(departureDate || new Date(), arrivalDate || new Date()));
-  const totalPrice = nights * (settings?.basePricePerNight || 0);
-  const totalPriceKES = totalPrice * KES_RATE;
+  
+  const getSeasonRate = (date: Date) => {
+    const month = date.getMonth(); 
+    const day = date.getDate();
+    if ((month === 11 && day >= 20) || (month === 0 && day <= 5)) return 80000;
+    if ((month >= 6 && month <= 9) || (month === 0 && day > 5) || month === 1 || month === 2) return 65000;
+    return 56000;
+  };
+
+  let calculatedPriceKES = 0;
+  if (bookingType === "stay") {
+    let currentDate = new Date(arrivalDate || new Date());
+    for (let i = 0; i < nights; i++) {
+      calculatedPriceKES += getSeasonRate(currentDate);
+      currentDate.setDate(currentDate.getDate() + 1);
+    }
+  } else {
+    if (eventGuests <= 100) calculatedPriceKES = 50000;
+    else if (eventGuests >= 200) calculatedPriceKES = 100000;
+    else calculatedPriceKES = 70000;
+  }
+
+  const totalPriceKES = calculatedPriceKES;
+  const totalPriceUSD = Math.round(totalPriceKES / KES_RATE);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -90,6 +131,11 @@ export default function ReservePage() {
   }, []);
 
   const handleCheckAvailability = async () => {
+    if (arrivalDate && departureDate && arrivalDate >= departureDate) {
+      alert("Please select a Check Out date and time that is after your Book In date.");
+      return;
+    }
+    
     setStep("checking");
     
     try {
@@ -145,7 +191,7 @@ export default function ReservePage() {
         </Link>
         
         {/* Left: Cinematic Image */}
-        <div className="hidden md:block w-1/2 h-full relative overflow-hidden bg-[#050505]">
+        <div className="hidden md:block w-1/2 h-full relative overflow-hidden bg-[#050505] z-10">
           <AnimatePresence mode="wait">
             <motion.div
                key={currentSlide}
@@ -183,7 +229,7 @@ export default function ReservePage() {
         </div>
 
         {/* Right: The Elite Booking Interface */}
-        <div data-lenis-prevent="true" className="dark-scrollbar w-full md:w-1/2 h-full pt-24 pb-6 px-6 md:pt-28 md:pb-8 md:px-12 lg:px-24 overscroll-contain relative flex flex-col overflow-y-auto">
+        <div data-lenis-prevent="true" className="dark-scrollbar w-full md:w-1/2 h-full pt-24 pb-6 px-6 md:pt-28 md:pb-8 md:px-12 lg:px-24 overscroll-contain relative z-20 bg-[#0a0a0a] flex flex-col overflow-y-auto">
           
           <AnimatePresence mode="wait">
             
@@ -219,7 +265,14 @@ export default function ReservePage() {
                       <p className="font-mono text-[10px] tracking-widest text-[#c2a27c] uppercase mb-2">Book In</p>
                       <DatePicker 
                         selected={arrivalDate} 
-                        onChange={(date: Date | null) => setArrivalDate(date)} 
+                        onChange={(date: Date | null) => {
+                          setArrivalDate(date);
+                          if (date && departureDate && date >= departureDate) {
+                            const nextDay = new Date(date);
+                            nextDay.setDate(nextDay.getDate() + 1);
+                            setDepartureDate(nextDay);
+                          }
+                        }} 
                         selectsStart
                         showTimeSelect
                         timeFormat="HH:mm"
@@ -237,7 +290,7 @@ export default function ReservePage() {
                             <span className="text-[9px] sm:text-[10px] font-light text-white/50 uppercase tracking-[0.2em] group-hover:text-white/80 transition-colors leading-tight">
                               {arrivalDate ? format(arrivalDate, "MMM") : "Sep"}<br/>
                               {arrivalDate ? format(arrivalDate, "yyyy") : "2026"}<br/>
-                              <span className="text-[#c2a27c] mt-1 block whitespace-nowrap">{arrivalDate ? format(arrivalDate, "h:mm a") : "2:00 PM"}</span>
+                              <span className="text-[#c2a27c] mt-1 block whitespace-nowrap">{mounted && arrivalDate ? format(arrivalDate, "h:mm a") : "2:00 PM"}</span>
                             </span>
                           </div>
                         }
@@ -263,7 +316,7 @@ export default function ReservePage() {
                             <span className="text-[9px] sm:text-[10px] font-light text-white/50 uppercase tracking-[0.2em] text-right group-hover:text-white/80 transition-colors leading-tight">
                               {departureDate ? format(departureDate, "MMM") : "Sep"}<br/>
                               {departureDate ? format(departureDate, "yyyy") : "2026"}<br/>
-                              <span className="text-[#c2a27c] mt-1 block whitespace-nowrap">{departureDate ? format(departureDate, "h:mm a") : "11:00 AM"}</span>
+                              <span className="text-[#c2a27c] mt-1 block whitespace-nowrap">{mounted && departureDate ? format(departureDate, "h:mm a") : "11:00 AM"}</span>
                             </span>
                             <span className="text-4xl sm:text-5xl lg:text-6xl font-serif font-light transition-colors group-hover:text-white">
                               {departureDate ? format(departureDate, "dd") : "28"}
@@ -372,7 +425,7 @@ export default function ReservePage() {
                     </div>
                   )}
 
-                  <div className="pt-6 relative z-10">
+                  <div className="pt-2 relative z-10">
                      <button onClick={handleCheckAvailability} className="relative group w-full flex items-center justify-between p-6 border border-white/10 hover:border-[#c2a27c] transition-colors cursor-pointer overflow-hidden">
                        <div className="absolute inset-0 bg-[#c2a27c] -translate-x-[101%] group-hover:translate-x-0 transition-transform duration-700 ease-[0.16,1,0.3,1]"></div>
                        <span className="relative z-10 font-serif text-2xl font-light group-hover:text-black transition-colors duration-700">Check Availability</span>
@@ -395,7 +448,13 @@ export default function ReservePage() {
             {/* STEP 2: CHECKING LOADER */}
             {step === "checking" && (
               <motion.div key="checking" variants={variants} initial="initial" animate="animate" exit="exit" transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }} className="w-full flex flex-col items-center justify-center h-full">
-                 <Loader2 className="w-12 h-12 text-[#c2a27c] animate-spin mb-8" strokeWidth={1} />
+                 <div className="w-32 h-[1px] bg-white/10 relative overflow-hidden mb-12">
+                   <motion.div 
+                     className="absolute top-0 bottom-0 left-0 w-1/3 bg-[#c2a27c]"
+                     animate={{ x: ["-100%", "400%"] }}
+                     transition={{ duration: 1.5, ease: "easeInOut", repeat: Infinity }}
+                   />
+                 </div>
                  <h2 className="text-4xl font-serif font-light mb-4">Verifying Dates</h2>
                  <p className="font-mono text-[10px] tracking-[0.2em] text-white/50 uppercase">Please wait a moment...</p>
               </motion.div>
@@ -462,7 +521,7 @@ export default function ReservePage() {
                        checkIn: (arrivalDate || new Date()).getTime(),
                        checkOut: (departureDate || new Date()).getTime(),
                        specialRequests: specialRequests || undefined,
-                       totalPrice: bookingType === "stay" ? totalPrice : undefined,
+                       totalPrice: totalPriceUSD,
                        bookingType,
                        eventType: bookingType === "event" ? eventType : undefined,
                        eventGuests: bookingType === "event" ? eventGuests : undefined,
@@ -489,12 +548,12 @@ export default function ReservePage() {
                     
                     <div className="flex flex-col md:flex-row md:items-center justify-between p-6 bg-white/[0.02] border border-white/10 rounded-xl mt-8">
                       <div>
-                        <p className="font-mono text-[10px] tracking-[0.2em] text-white/50 uppercase mb-1">{bookingType === "stay" ? `Total Stay (${nights} Nights)` : "Event Pricing"}</p>
-                        <p className="text-2xl font-serif text-white">{bookingType === "stay" ? `$${totalPrice.toLocaleString()}` : "To Be Determined"}</p>
+                        <p className="font-mono text-[10px] tracking-[0.2em] text-white/50 uppercase mb-1">{bookingType === "stay" ? `Total Stay (${nights} Nights)` : `Event Pricing (${eventGuests} Guests)`}</p>
+                        <p className="text-2xl font-serif text-white">KES {totalPriceKES.toLocaleString()}</p>
                       </div>
                       <div className="text-left md:text-right mt-4 md:mt-0">
-                        <p className="font-mono text-[10px] tracking-[0.2em] text-[#c2a27c] uppercase mb-1">{bookingType === "stay" ? "Equivalent" : "Based on Requirements"}</p>
-                        <p className="text-sm font-mono text-[#c2a27c]">{bookingType === "stay" ? `KES ${totalPriceKES.toLocaleString()}` : "Contact for Quote"}</p>
+                        <p className="font-mono text-[10px] tracking-[0.2em] text-[#c2a27c] uppercase mb-1">Equivalent</p>
+                        <p className="text-sm font-mono text-[#c2a27c]">~ ${totalPriceUSD.toLocaleString()}</p>
                       </div>
                     </div>
                     
@@ -539,6 +598,143 @@ export default function ReservePage() {
         </div>
 
       </div>
+
+      {/* Rates Booklet Drawer - Desktop (Hidden behind right panel, slides to the left) */}
+      <div ref={drawerRef} className={`hidden md:flex fixed top-0 left-1/2 h-full w-[400px] bg-[#050505] border-l border-[#c2a27c]/20 shadow-2xl transition-transform duration-500 ease-[0.16,1,0.3,1] z-[15] pointer-events-auto transform ${isRatesOpen ? '-translate-x-full' : 'translate-x-0'} flex-col`}>
+        
+        {/* Toggle Button attached to the left edge */}
+        <button 
+          onClick={() => setIsRatesOpen(!isRatesOpen)}
+          className="absolute top-1/2 -left-[2.5rem] -translate-y-1/2 w-10 bg-[#c2a27c] text-black py-6 flex flex-col items-center justify-center gap-3 hover:bg-white transition-colors cursor-pointer border border-[#c2a27c]/50 rounded-l-md shadow-[0_0_20px_rgba(0,0,0,0.5)]"
+        >
+          {isRatesOpen ? <ChevronRight className="w-4 h-4" strokeWidth={1.5} /> : <ChevronLeft className="w-4 h-4" strokeWidth={1.5} />}
+          <span className="font-mono text-[10px] tracking-[0.2em] uppercase" style={{ writingMode: 'vertical-rl', textOrientation: 'mixed' }}>Rates</span>
+        </button>
+
+        <div className="p-8 pt-24 border-b border-white/10 flex-shrink-0 relative overflow-hidden">
+          <div className="absolute top-0 right-0 w-32 h-32 bg-[#c2a27c] blur-[100px] opacity-10 rounded-full" />
+          <h2 className="font-serif text-3xl font-light text-[#c2a27c] relative z-10">Rate Card</h2>
+          <p className="font-mono text-[10px] uppercase tracking-widest text-white/50 mt-2 relative z-10">Ficus & Figs Pricing</p>
+        </div>
+        <div data-lenis-prevent="true" className="p-8 flex-1 overflow-y-auto space-y-10 dark-scrollbar relative overscroll-contain">
+           <div>
+             <h3 className="font-mono text-xs uppercase tracking-[0.2em] text-[#c2a27c] mb-6 border-b border-white/10 pb-4 flex items-center gap-2">
+               <span>Stays (Per Night)</span>
+             </h3>
+             <ul className="space-y-6">
+               <li className="flex justify-between items-end group">
+                 <div>
+                   <p className="font-serif text-xl text-white group-hover:text-[#c2a27c] transition-colors">Low Season</p>
+                   <p className="font-mono text-[9px] uppercase tracking-wider text-white/40 mt-1">Apr-Jun, Nov-Dec 19</p>
+                 </div>
+                 <p className="font-mono text-sm text-white">KES 56,000</p>
+               </li>
+               <li className="flex justify-between items-end group">
+                 <div>
+                   <p className="font-serif text-xl text-white group-hover:text-[#c2a27c] transition-colors">High Season</p>
+                   <p className="font-mono text-[9px] uppercase tracking-wider text-white/40 mt-1">Jul-Oct, Jan 6-Mar 31</p>
+                 </div>
+                 <p className="font-mono text-sm text-white">KES 65,000</p>
+               </li>
+               <li className="flex justify-between items-end group">
+                 <div>
+                   <p className="font-serif text-xl text-white group-hover:text-[#c2a27c] transition-colors">Festive Season</p>
+                   <p className="font-mono text-[9px] uppercase tracking-wider text-white/40 mt-1">Dec 20 - Jan 5</p>
+                 </div>
+                 <p className="font-mono text-sm text-white">KES 80,000</p>
+               </li>
+             </ul>
+           </div>
+           <div>
+             <h3 className="font-mono text-xs uppercase tracking-[0.2em] text-[#c2a27c] mb-6 border-b border-white/10 pb-4 flex items-center gap-2">
+               <span>Weddings & Events</span>
+             </h3>
+             <ul className="space-y-6">
+               <li className="flex justify-between items-end group">
+                 <div>
+                   <p className="font-serif text-xl text-white group-hover:text-[#c2a27c] transition-colors">Intimate</p>
+                   <p className="font-mono text-[9px] uppercase tracking-wider text-white/40 mt-1">Up to 100 Guests</p>
+                 </div>
+                 <p className="font-mono text-sm text-white">KES 50,000</p>
+               </li>
+               <li className="flex justify-between items-end group">
+                 <div>
+                   <p className="font-serif text-xl text-white group-hover:text-[#c2a27c] transition-colors">Standard</p>
+                   <p className="font-mono text-[9px] uppercase tracking-wider text-white/40 mt-1">101 - 199 Guests</p>
+                 </div>
+                 <p className="font-mono text-sm text-white">KES 70,000</p>
+               </li>
+               <li className="flex justify-between items-end group">
+                 <div>
+                   <p className="font-serif text-xl text-white group-hover:text-[#c2a27c] transition-colors">Grand</p>
+                   <p className="font-mono text-[9px] uppercase tracking-wider text-white/40 mt-1">200 - 500 Guests</p>
+                 </div>
+                 <p className="font-mono text-sm text-white">KES 100,000</p>
+               </li>
+             </ul>
+             <div className="mt-8 p-4 bg-[#c2a27c]/5 border border-[#c2a27c]/10 rounded-md">
+               <p className="font-mono text-[9px] text-[#c2a27c]/80 uppercase leading-relaxed text-center">Event rates apply to grounds rental only.</p>
+             </div>
+           </div>
+        </div>
+      </div>
+
+      {/* Rates Booklet Drawer - Mobile (Slides from right edge) */}
+      <div className={`md:hidden fixed top-0 right-0 h-[100dvh] w-[85vw] max-w-[400px] bg-[#050505] border-l border-[#c2a27c]/20 z-[120] shadow-2xl transition-transform duration-500 ease-[0.16,1,0.3,1] transform ${isRatesOpen ? 'translate-x-0' : 'translate-x-full'} flex flex-col`}>
+        <button 
+          onClick={() => setIsRatesOpen(!isRatesOpen)}
+          className="absolute top-1/2 -left-[2.5rem] -translate-y-1/2 w-10 bg-[#c2a27c] text-black py-6 flex flex-col items-center justify-center gap-3 hover:bg-white transition-colors rounded-l-md shadow-[0_0_20px_rgba(0,0,0,0.5)] cursor-pointer border border-[#c2a27c]/50"
+        >
+          {isRatesOpen ? <ChevronRight className="w-4 h-4" strokeWidth={1.5} /> : <ChevronLeft className="w-4 h-4" strokeWidth={1.5} />}
+          <span className="font-mono text-[10px] tracking-[0.2em] uppercase" style={{ writingMode: 'vertical-rl', textOrientation: 'mixed' }}>Rates</span>
+        </button>
+        <div className="p-8 pt-24 border-b border-white/10 flex-shrink-0 relative overflow-hidden">
+          <div className="absolute top-0 right-0 w-32 h-32 bg-[#c2a27c] blur-[100px] opacity-10 rounded-full" />
+          <h2 className="font-serif text-3xl font-light text-[#c2a27c] relative z-10">Rate Card</h2>
+          <p className="font-mono text-[10px] uppercase tracking-widest text-white/50 mt-2 relative z-10">Pricing</p>
+        </div>
+        <div data-lenis-prevent="true" className="p-8 flex-1 overflow-y-auto space-y-10 dark-scrollbar relative overscroll-contain">
+           <div>
+             <h3 className="font-mono text-xs uppercase tracking-[0.2em] text-[#c2a27c] mb-6 border-b border-white/10 pb-4">Stays (Per Night)</h3>
+             <ul className="space-y-6">
+               <li className="flex justify-between items-end">
+                 <div><p className="font-serif text-xl text-white">Low</p></div>
+                 <p className="font-mono text-sm text-white">KES 56,000</p>
+               </li>
+               <li className="flex justify-between items-end">
+                 <div><p className="font-serif text-xl text-white">High</p></div>
+                 <p className="font-mono text-sm text-white">KES 65,000</p>
+               </li>
+               <li className="flex justify-between items-end">
+                 <div><p className="font-serif text-xl text-white">Festive</p></div>
+                 <p className="font-mono text-sm text-white">KES 80,000</p>
+               </li>
+             </ul>
+           </div>
+           <div>
+             <h3 className="font-mono text-xs uppercase tracking-[0.2em] text-[#c2a27c] mb-6 border-b border-white/10 pb-4">Weddings & Events</h3>
+             <ul className="space-y-6">
+               <li className="flex justify-between items-end">
+                 <div><p className="font-serif text-xl text-white">Intimate</p></div>
+                 <p className="font-mono text-sm text-white">KES 50,000</p>
+               </li>
+               <li className="flex justify-between items-end">
+                 <div><p className="font-serif text-xl text-white">Standard</p></div>
+                 <p className="font-mono text-sm text-white">KES 70,000</p>
+               </li>
+               <li className="flex justify-between items-end">
+                 <div><p className="font-serif text-xl text-white">Grand</p></div>
+                 <p className="font-mono text-sm text-white">KES 100,000</p>
+               </li>
+             </ul>
+           </div>
+        </div>
+      </div>
+
+      {/* Backdrop for mobile */}
+      {isRatesOpen && (
+        <div className="fixed md:hidden inset-0 bg-black/60 backdrop-blur-sm z-[110]" onClick={() => setIsRatesOpen(false)} />
+      )}
 
       {/* Privacy Policy Modal */}
       <AnimatePresence>
