@@ -52,7 +52,8 @@ const slides = [
 ];
 
 export default function ReservePage() {
-  const drawerRef = useRef<HTMLDivElement>(null);
+  const desktopDrawerRef = useRef<HTMLDivElement>(null);
+  const mobileDrawerRef = useRef<HTMLDivElement>(null);
 
   const [adults, setAdults] = useState(1);
   const [children, setChildren] = useState(0);
@@ -80,7 +81,10 @@ export default function ReservePage() {
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
-      if (drawerRef.current && !drawerRef.current.contains(event.target as Node)) {
+      const isOutsideDesktop = desktopDrawerRef.current && !desktopDrawerRef.current.contains(event.target as Node);
+      const isOutsideMobile = mobileDrawerRef.current && !mobileDrawerRef.current.contains(event.target as Node);
+      
+      if (isOutsideDesktop && isOutsideMobile) {
         setIsRatesOpen(false);
       }
     }
@@ -260,7 +264,7 @@ export default function ReservePage() {
 
                 <div className="space-y-6">
                   <p className="text-center font-mono text-[10px] tracking-[0.2em] uppercase text-white/50 w-full mb-2">Please select your date and time</p>
-                  <div className="flex flex-row justify-between items-center border-b border-white/10 pb-6 gap-2 sm:gap-4 date-picker-wrapper relative z-50">
+                  <div className="flex flex-row justify-between items-center border-b border-white/10 pb-6 gap-2 sm:gap-4 date-picker-wrapper relative z-[100]">
                     <div className="group cursor-pointer flex-1">
                       <p className="font-mono text-[10px] tracking-widest text-[#c2a27c] uppercase mb-2">Book In</p>
                       <DatePicker 
@@ -287,7 +291,7 @@ export default function ReservePage() {
                             <span className="text-4xl sm:text-5xl lg:text-6xl font-serif font-light transition-colors group-hover:text-white">
                               {arrivalDate ? format(arrivalDate, "dd") : "24"}
                             </span>
-                            <span className="text-[9px] sm:text-[10px] font-light text-white/50 uppercase tracking-[0.2em] group-hover:text-white/80 transition-colors leading-tight">
+                            <span className="text-[9px] sm:text-[10px] font-light text-white/90 uppercase tracking-[0.2em] group-hover:text-white transition-colors leading-tight">
                               {arrivalDate ? format(arrivalDate, "MMM") : "Sep"}<br/>
                               {arrivalDate ? format(arrivalDate, "yyyy") : "2026"}<br/>
                               <span className="text-[#c2a27c] mt-1 block whitespace-nowrap">{mounted && arrivalDate ? format(arrivalDate, "h:mm a") : "2:00 PM"}</span>
@@ -313,7 +317,7 @@ export default function ReservePage() {
                         minDate={arrivalDate || new Date()}
                         customInput={
                           <div className="flex items-baseline gap-1 sm:gap-2 justify-end">
-                            <span className="text-[9px] sm:text-[10px] font-light text-white/50 uppercase tracking-[0.2em] text-right group-hover:text-white/80 transition-colors leading-tight">
+                            <span className="text-[9px] sm:text-[10px] font-light text-white/90 uppercase tracking-[0.2em] text-right group-hover:text-white transition-colors leading-tight">
                               {departureDate ? format(departureDate, "MMM") : "Sep"}<br/>
                               {departureDate ? format(departureDate, "yyyy") : "2026"}<br/>
                               <span className="text-[#c2a27c] mt-1 block whitespace-nowrap">{mounted && departureDate ? format(departureDate, "h:mm a") : "11:00 AM"}</span>
@@ -600,7 +604,7 @@ export default function ReservePage() {
       </div>
 
       {/* Rates Booklet Drawer - Desktop (Hidden behind right panel, slides to the left) */}
-      <div ref={drawerRef} className={`hidden md:flex fixed top-0 left-1/2 h-full w-[400px] bg-[#050505] border-l border-[#c2a27c]/20 shadow-2xl transition-transform duration-500 ease-[0.16,1,0.3,1] z-[15] pointer-events-auto transform ${isRatesOpen ? '-translate-x-full' : 'translate-x-0'} flex-col`}>
+      <div ref={desktopDrawerRef} className={`hidden md:flex fixed top-0 left-1/2 h-full w-[400px] bg-[#050505] border-l border-[#c2a27c]/20 shadow-2xl transition-transform duration-500 ease-[0.16,1,0.3,1] z-[15] pointer-events-auto transform ${isRatesOpen ? '-translate-x-full' : 'translate-x-0'} flex-col`}>
         
         {/* Toggle Button attached to the left edge */}
         <button 
@@ -680,10 +684,10 @@ export default function ReservePage() {
       </div>
 
       {/* Rates Booklet Drawer - Mobile (Slides from right edge) */}
-      <div className={`md:hidden fixed top-0 right-0 h-[100dvh] w-[85vw] max-w-[400px] bg-[#050505] border-l border-[#c2a27c]/20 z-[120] shadow-2xl transition-transform duration-500 ease-[0.16,1,0.3,1] transform ${isRatesOpen ? 'translate-x-0' : 'translate-x-full'} flex flex-col`}>
+      <div ref={mobileDrawerRef} className={`md:hidden fixed top-0 right-0 h-[100dvh] w-[85vw] max-w-[400px] bg-[#050505] border-l border-[#c2a27c]/20 z-[120] shadow-2xl transition-transform duration-500 ease-[0.16,1,0.3,1] transform ${isRatesOpen ? 'translate-x-0' : 'translate-x-full'} flex flex-col`}>
         <button 
           onClick={() => setIsRatesOpen(!isRatesOpen)}
-          className="absolute top-1/2 -left-[2.5rem] -translate-y-1/2 w-10 bg-[#c2a27c] text-black py-6 flex flex-col items-center justify-center gap-3 hover:bg-white transition-colors rounded-l-md shadow-[0_0_20px_rgba(0,0,0,0.5)] cursor-pointer border border-[#c2a27c]/50"
+          className="absolute bottom-32 -left-[2.5rem] w-10 bg-[#c2a27c] text-black py-6 flex flex-col items-center justify-center gap-3 hover:bg-white transition-colors rounded-l-md shadow-[0_0_20px_rgba(0,0,0,0.5)] cursor-pointer border border-[#c2a27c]/50"
         >
           {isRatesOpen ? <ChevronRight className="w-4 h-4" strokeWidth={1.5} /> : <ChevronLeft className="w-4 h-4" strokeWidth={1.5} />}
           <span className="font-mono text-[10px] tracking-[0.2em] uppercase" style={{ writingMode: 'vertical-rl', textOrientation: 'mixed' }}>Rates</span>
