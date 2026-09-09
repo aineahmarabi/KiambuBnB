@@ -77,7 +77,7 @@ export default function BookingsPage() {
               <BookingCard 
                 key={booking._id} 
                 booking={booking} 
-                onDelete={(id) => deleteBooking({ id })} 
+                onDelete={(id) => deleteBooking({ id: id as any })} 
                 onUpdateStatus={(id, status, checkOut) => updateBookingStatus({ id: id as any, status, checkOut })}
               />
             ))}
