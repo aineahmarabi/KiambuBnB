@@ -73,8 +73,7 @@ export default function ReservePage() {
   const [isPrivacyOpen, setIsPrivacyOpen] = useState(false);
   const [isEventTypeOpen, setIsEventTypeOpen] = useState(false);
   
-  const [firstName, setFirstName] = useState("");
-  const [lastName, setLastName] = useState("");
+  const [fullName, setFullName] = useState("");
 
   const settings = useQuery(api.settings?.getSettings || (() => null));
   
@@ -416,15 +415,17 @@ export default function ReservePage() {
                  <div className="p-8 border border-[#c2a27c]/30 bg-[#c2a27c]/5 mb-12">
                     <p className="font-mono text-[10px] tracking-widest text-[#c2a27c] uppercase mb-6">Suggested Availability</p>
                     <div className="flex justify-between items-center">
-                       <div>
-                         <p className="font-serif text-3xl font-light">{suggestedDates && format(suggestedDates.arrival, "dd MMM")}</p>
-                         <p className="text-white/50 text-sm font-light">Book In</p>
-                       </div>
+                        <div>
+                          <p className="font-serif text-3xl font-light">{suggestedDates && format(suggestedDates.arrival, "dd MMM")}</p>
+                          <p className="text-white/50 text-sm font-light mt-1">Book In</p>
+                          <p className="font-mono text-[10px] text-[#c2a27c]/70 mt-2">{suggestedDates && format(suggestedDates.arrival, "h:mm a")}</p>
+                        </div>
                        <ArrowRight className="w-6 h-6 text-white/20 font-light" strokeWidth={1} />
-                       <div className="text-right">
-                         <p className="font-serif text-3xl font-light">{suggestedDates && format(suggestedDates.departure, "dd MMM")}</p>
-                         <p className="text-white/50 text-sm font-light">Check Out</p>
-                       </div>
+                        <div className="text-right">
+                          <p className="font-serif text-3xl font-light">{suggestedDates && format(suggestedDates.departure, "dd MMM")}</p>
+                          <p className="text-white/50 text-sm font-light mt-1">Check Out</p>
+                          <p className="font-mono text-[10px] text-[#c2a27c]/70 mt-2">{suggestedDates && format(suggestedDates.departure, "h:mm a")}</p>
+                        </div>
                     </div>
                  </div>
 
@@ -454,7 +455,7 @@ export default function ReservePage() {
                    e.preventDefault(); 
                    try {
                      await createBooking({
-                       guestName: `${firstName} ${lastName}`.trim(),
+                       guestName: fullName.trim(),
                        email,
                        adults: bookingType === "stay" ? adults : 0,
                        children: bookingType === "stay" ? children : 0,
@@ -480,9 +481,8 @@ export default function ReservePage() {
                      }
                    }
                  }}>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
-                      <input required type="text" value={firstName} onChange={e=>setFirstName(e.target.value)} placeholder="First Name" className="w-full bg-transparent border-b border-white/20 px-0 py-2 text-sm focus:outline-none focus:border-[#c2a27c] transition-colors text-white placeholder-white/40" />
-                      <input required type="text" value={lastName} onChange={e=>setLastName(e.target.value)} placeholder="Last Name" className="w-full bg-transparent border-b border-white/20 px-0 py-2 text-sm focus:outline-none focus:border-[#c2a27c] transition-colors text-white placeholder-white/40" />
+                    <div className="grid grid-cols-1 gap-8">
+                      <input required type="text" value={fullName} onChange={e=>setFullName(e.target.value)} placeholder="Full Name" className="w-full bg-transparent border-b border-white/20 px-0 py-2 text-sm focus:outline-none focus:border-[#c2a27c] transition-colors text-white placeholder-white/40" />
                     </div>
                     <input required type="email" value={email} onChange={e=>setEmail(e.target.value)} placeholder="Email Address" className="w-full bg-transparent border-b border-white/20 px-0 py-2 text-sm focus:outline-none focus:border-[#c2a27c] transition-colors text-white placeholder-white/40" />
                     <textarea value={specialRequests} onChange={e=>setSpecialRequests(e.target.value)} placeholder="Special Requests (Optional)" rows={3} className="w-full bg-transparent border-b border-white/20 px-0 py-2 text-sm focus:outline-none focus:border-[#c2a27c] transition-colors text-white placeholder-white/40 resize-none"></textarea>

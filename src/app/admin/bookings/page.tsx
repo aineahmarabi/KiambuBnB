@@ -267,6 +267,7 @@ function BookingCard({ booking, onDelete, onUpdateStatus }: { booking: any, onDe
           <p className="font-mono text-[10px] text-[#c2a27c] uppercase tracking-widest mb-1">Check In</p>
           <p className="font-serif text-3xl">{format(new Date(booking.checkIn), "dd")}</p>
           <p className="text-xs text-white/50">{format(new Date(booking.checkIn), "MMM yyyy")}</p>
+          <p className="font-mono text-[10px] text-[#c2a27c]/70 mt-1">{format(new Date(booking.checkIn), "h:mm a")}</p>
         </div>
         <div className="flex flex-col items-center">
           <div className="h-[1px] w-8 bg-white/20"></div>
@@ -276,6 +277,7 @@ function BookingCard({ booking, onDelete, onUpdateStatus }: { booking: any, onDe
           <p className="font-mono text-[10px] text-[#c2a27c] uppercase tracking-widest mb-1">Check Out</p>
           <p className="font-serif text-3xl">{format(new Date(booking.checkOut), "dd")}</p>
           <p className="text-xs text-white/50">{format(new Date(booking.checkOut), "MMM yyyy")}</p>
+          <p className="font-mono text-[10px] text-[#c2a27c]/70 mt-1">{format(new Date(booking.checkOut), "h:mm a")}</p>
         </div>
       </div>
 

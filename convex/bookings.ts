@@ -15,11 +15,12 @@ export const checkAvailability = query({
   handler: async (ctx, args) => {
     const bookings = await ctx.db.query("bookings").collect();
     
-    // Find any overlapping bookings
+    // Find any overlapping bookings (with 30-minute cleaning buffer)
+    const BUFFER_MS = 30 * 60 * 1000;
     const overlapping = bookings.filter((b) => 
       b.status !== "cancelled" && 
-      b.checkIn < args.checkOut && 
-      b.checkOut > args.checkIn
+      b.checkIn < (args.checkOut + BUFFER_MS) && 
+      (b.checkOut + BUFFER_MS) > args.checkIn
     );
 
     if (overlapping.length > 0) {
@@ -31,8 +32,8 @@ export const checkAvailability = query({
         const nextAvailableEnd = nextAvailableStart + duration;
         const stillOverlapping = bookings.filter((b) => 
           b.status !== "cancelled" && 
-          b.checkIn < nextAvailableEnd && 
-          b.checkOut > nextAvailableStart
+          b.checkIn < (nextAvailableEnd + BUFFER_MS) && 
+          (b.checkOut + BUFFER_MS) > nextAvailableStart
         );
         
         if (stillOverlapping.length === 0) {
@@ -61,12 +62,13 @@ export const createBooking = mutation({
     eventGuests: v.optional(v.number()),
   },
   handler: async (ctx, args) => {
-    // PRE-CHECK: Prevent overlapping bookings
+    // PRE-CHECK: Prevent overlapping bookings (with 30-minute buffer)
+    const BUFFER_MS = 30 * 60 * 1000;
     const allBookings = await ctx.db.query("bookings").collect();
     const overlapping = allBookings.filter((b) => 
       b.status !== "cancelled" && 
-      b.checkIn < args.checkOut && 
-      b.checkOut > args.checkIn
+      b.checkIn < (args.checkOut + BUFFER_MS) && 
+      (b.checkOut + BUFFER_MS) > args.checkIn
     );
 
     if (overlapping.length > 0) {

@@ -79,8 +79,7 @@ const WhatsappIcon = ({ className, strokeWidth = 1.5 }: { className?: string, st
 
 export function Footer() {
   const [modalContent, setModalContent] = useState<{ title: string; body: string } | null>(null);
-  const [firstName, setFirstName] = useState("");
-  const [lastName, setLastName] = useState("");
+  const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [message, setMessage] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -168,14 +167,13 @@ export function Footer() {
                   setIsSubmitting(true);
                   try {
                     await submitInquiry({
-                      name: `${firstName} ${lastName}`.trim(),
+                      name: fullName.trim(),
                       email,
                       subject: "Website Inquiry",
                       message
                     });
                     setSubmitSuccess(true);
-                    setFirstName("");
-                    setLastName("");
+                    setFullName("");
                     setEmail("");
                     setMessage("");
                     setTimeout(() => setSubmitSuccess(false), 5000);
@@ -187,8 +185,7 @@ export function Footer() {
                 }}
               >
                 <div className="grid grid-cols-1 gap-8">
-                  <input type="text" value={firstName} onChange={e=>setFirstName(e.target.value)} placeholder="First Name" className="w-full bg-transparent border-b border-white/20 px-0 py-2 text-sm focus:outline-none focus:border-[#c2a27c] transition-colors text-white placeholder-white/40" />
-                  <input type="text" value={lastName} onChange={e=>setLastName(e.target.value)} placeholder="Last Name" className="w-full bg-transparent border-b border-white/20 px-0 py-2 text-sm focus:outline-none focus:border-[#c2a27c] transition-colors text-white placeholder-white/40" />
+                  <input type="text" value={fullName} onChange={e=>setFullName(e.target.value)} placeholder="Full Name" required className="w-full bg-transparent border-b border-white/20 px-0 py-2 text-sm focus:outline-none focus:border-[#c2a27c] transition-colors text-white placeholder-white/40" />
                 </div>
                 <input type="email" value={email} onChange={e=>setEmail(e.target.value)} placeholder="Email Address" required className="w-full bg-transparent border-b border-white/20 px-0 py-2 text-sm focus:outline-none focus:border-[#c2a27c] transition-colors text-white placeholder-white/40" />
                 <textarea value={message} onChange={e=>setMessage(e.target.value)} placeholder="Tell us about your intended stay" required rows={3} className="w-full bg-transparent border-b border-white/20 px-0 py-2 text-sm focus:outline-none focus:border-[#c2a27c] transition-colors text-white placeholder-white/40 resize-none"></textarea>
