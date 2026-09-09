@@ -1,0 +1,379 @@
+   ▲ Next.js 15.5.23
+   - Local:        http://localhost:3001
+   - Network:      http://172.26.36.53:3001
+
+ ✓ Starting...
+ ✓ Ready in 16.9s
+ ○ Compiling / ...
+Request timed out after 3000ms
+
+Retrying 1/3...
+Request timed out after 3000ms
+
+Retrying 1/3...
+ ✓ Compiled / in 23.1s (1490 modules)
+ GET / 200 in 25145ms
+ ○ Compiling /favicon.ico ...
+ ✓ Compiled /favicon.ico in 954ms (831 modules)
+ GET /favicon.ico 200 in 1344ms
+ ○ Compiling /gallery ...
+ ✓ Compiled /gallery in 1997ms (1481 modules)
+ GET /gallery 200 in 2425ms
+ GET /gallery 200 in 95ms
+ ○ Compiling /details ...
+ ✓ Compiled /details in 1151ms (1479 modules)
+ GET /details 200 in 1482ms
+ ○ Compiling /location ...
+ ✓ Compiled /location in 6.2s (1510 modules)
+ GET /location 200 in 7586ms
+ GET /location 200 in 3411ms
+ ○ Compiling /favicon.ico ...
+ ✓ Compiled /favicon.ico in 2s (881 modules)
+ GET /favicon.ico 200 in 2953ms
+ GET / 200 in 1877ms
+ GET / 200 in 1227ms
+ GET / 200 in 441ms
+ GET / 200 in 637ms
+ GET /gallery 200 in 1787ms
+ GET /details 200 in 900ms
+ ✓ Compiled in 5.3s (1524 modules)
+ GET / 200 in 721ms
+ GET / 200 in 1541ms
+ GET / 200 in 517ms
+ ✓ Compiled in 4.4s (1524 modules)
+ GET / 200 in 590ms
+ GET / 200 in 184ms
+ ⚠ Fast Refresh had to perform a full reload due to a runtime error.
+ ⨯ ReferenceError: filter is not defined
+    at Hero (src\components\sections\home\Hero.tsx:160:27)
+  158 |       <div className="sticky top-0 h-screen overflow-hidden bg-ink">
+  159 |         <motion.div
+> 160 |           style={{ scale, filter }}
+      |                           ^
+  161 |           className="absolute inset-0 h-full w-full origin-top"
+  162 |         >
+  163 |           {Array.from({ length: PANEL_COUNT }).map((_, i) => ( {
+  digest: '1457157521'
+}
+ ⚠ Fast Refresh had to perform a full reload due to a runtime error.
+ GET / 500 in 1138ms
+ ⨯ ReferenceError: filter is not defined
+    at Hero (src\components\sections\home\Hero.tsx:160:27)
+  158 |       <div className="sticky top-0 h-screen overflow-hidden bg-ink">
+  159 |         <motion.div
+> 160 |           style={{ scale, filter }}
+      |                           ^
+  161 |           className="absolute inset-0 h-full w-full origin-top"
+  162 |         >
+  163 |           {Array.from({ length: PANEL_COUNT }).map((_, i) => ( {
+  digest: '1457157521'
+}
+ GET / 500 in 542ms
+ ✓ Compiled in 2.3s (1524 modules)
+ ✓ Compiled in 1166ms (660 modules)
+ ✓ Compiled in 985ms (660 modules)
+ ○ Compiling /favicon.ico ...
+ ✓ Compiled /favicon.ico in 965ms (881 modules)
+ GET /favicon.ico 200 in 1502ms
+ GET /favicon.ico 200 in 34ms
+ GET /favicon.ico 200 in 39ms
+ GET /favicon.ico 200 in 47ms
+ ✓ Compiled in 1864ms (1541 modules)
+ GET / 200 in 675ms
+ GET / 200 in 215ms
+ ✓ Compiled in 3.2s (1524 modules)
+ GET / 200 in 710ms
+ GET / 200 in 173ms
+ ✓ Compiled in 2s (1524 modules)
+ GET / 200 in 535ms
+ GET / 200 in 187ms
+ ✓ Compiled in 3.3s (1524 modules)
+ GET / 200 in 372ms
+ GET / 200 in 168ms
+ ✓ Compiled in 630ms (660 modules)
+ GET / 200 in 194ms
+ GET / 200 in 232ms
+ GET / 200 in 1180ms
+ ⚠ Fast Refresh had to perform a full reload due to a runtime error.
+ ⚠ Fast Refresh had to perform a full reload due to a runtime error.
+ ✓ Compiled in 69.3s (1524 modules)
+ ⚠ Fast Refresh had to perform a full reload due to a runtime error.
+ ⚠ Fast Refresh had to perform a full reload due to a runtime error.
+ GET / 200 in 28451ms
+ ⚠ Fast Refresh had to perform a full reload due to a runtime error.
+ GET / 200 in 1412ms
+ ○ Compiling /favicon.ico ...
+ ✓ Compiled /favicon.ico in 12.1s (881 modules)
+ GET /favicon.ico 200 in 16095ms
+ GET / 200 in 26623ms
+ ✓ Compiled in 3.5s (660 modules)
+ ✓ Compiled in 904ms (660 modules)
+ GET / 200 in 213ms
+ GET / 200 in 132ms
+ ✓ Compiled in 7s (1524 modules)
+ GET / 200 in 18049ms
+ ✓ Compiled in 3.2s (1524 modules)
+ GET / 200 in 580ms
+ ✓ Compiled in 2.9s (1524 modules)
+ GET / 200 in 460ms
+ ✓ Compiled in 8.8s (1524 modules)
+ GET / 200 in 1266ms
+ ✓ Compiled in 10.3s (1524 modules)
+ ⚠ Fast Refresh had to perform a full reload due to a runtime error.
+ GET / 200 in 2218ms
+ ⨯ ReferenceError: PANEL_COUNT is not defined
+    at Hero (src\components\sections\home\Hero.tsx:202:33)
+  200 |           className="absolute inset-0 h-full w-full origin-top"
+  201 |         >
+> 202 |           {Array.from({ length: PANEL_COUNT }).map((_, i) => (
+      |                                 ^
+  203 |             <div
+  204 |               key={i}
+  205 |               ref={(el) => { {
+  digest: '1469774603'
+}
+ GET / 500 in 2559ms
+ ○ Compiling /favicon.ico ...
+ ⚠ Fast Refresh had to perform a full reload due to a runtime error.
+ ✓ Compiled /favicon.ico in 15.6s (1541 modules)
+ GET /favicon.ico 200 in 16063ms
+ ⨯ ReferenceError: PANEL_COUNT is not defined
+    at Hero (src\components\sections\home\Hero.tsx:203:33)
+  201 |           className="absolute inset-0 h-full w-full origin-top"
+  202 |         >
+> 203 |           {Array.from({ length: PANEL_COUNT }).map((_, i) => (
+      |                                 ^
+  204 |             <div
+  205 |               key={i}
+  206 |               ref={(el) => { {
+  digest: '1469774603'
+}
+ ⚠ Fast Refresh had to perform a full reload due to a runtime error.
+ GET / 500 in 19316ms
+ ✓ Compiled in 12s (1541 modules)
+ GET /favicon.ico 200 in 184ms
+ GET /favicon.ico 200 in 73ms
+ ✓ Compiled in 1497ms (660 modules)
+ ✓ Compiled in 969ms (660 modules)
+ GET / 200 in 646ms
+ GET / 200 in 2410ms
+ ⚠ Fast Refresh had to perform a full reload. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
+ GET / 200 in 544ms
+ ✓ Compiled in 2.4s (1524 modules)
+ ✓ Compiled in 766ms (660 modules)
+ GET / 200 in 6716ms
+ GET / 200 in 551ms
+ GET / 200 in 591ms
+ ○ Compiling /favicon.ico ...
+ ✓ Compiled /favicon.ico in 3.3s (881 modules)
+ GET /favicon.ico 200 in 4523ms
+ GET / 200 in 2593ms
+ GET /favicon.ico 200 in 55ms
+ ✓ Compiled in 3.1s (1524 modules)
+ ⚠ Fast Refresh had to perform a full reload due to a runtime error.
+ ⨯ ReferenceError: AnimatePresence is not defined
+    at Hero (src\components\sections\home\Hero.tsx:112:10)
+  110 |     <section ref={sectionRef} className="relative h-[145vh]">
+  111 |       <div className="sticky top-0 h-screen overflow-hidden bg-ink">
+> 112 |         <AnimatePresence>{loading ? <OpeningOrb /> : null}</AnimatePresence>
+      |          ^
+  113 |
+  114 |         <div
+  115 |           style={{ transform: `scale(${scale})` }} {
+  digest: '985061757'
+}
+ GET / 500 in 2009ms
+ ○ Compiling /favicon.ico ...
+ ✓ Compiled /favicon.ico in 1705ms (881 modules)
+ GET /favicon.ico 200 in 2308ms
+ GET /favicon.ico 200 in 44ms
+ ✓ Compiled in 4.2s (1541 modules)
+ ⨯ ReferenceError: AnimatePresence is not defined
+    at Hero (src\components\sections\home\Hero.tsx:74:10)
+  72 |     <section ref={sectionRef} className="relative h-[145vh]">
+  73 |       <div className="sticky top-0 h-screen overflow-hidden bg-ink">
+> 74 |         <AnimatePresence>{loading ? <OpeningOrb /> : null}</AnimatePresence>
+     |          ^
+  75 |
+  76 |         <div
+  77 |           style={{ transform: `scale(${scale})` }} {
+  digest: '3616588792'
+}
+ ⚠ Fast Refresh had to perform a full reload due to a runtime error.
+ GET / 500 in 1433ms
+ GET /favicon.ico 200 in 340ms
+ ⚠ Fast Refresh had to perform a full reload due to a runtime error.
+ ⚠ Fast Refresh had to perform a full reload due to a runtime error.
+ ✓ Compiled in 4.9s (1541 modules)
+ GET / 200 in 2886ms
+ GET /favicon.ico 200 in 51ms
+ ✓ Compiled in 827ms (660 modules)
+ GET / 200 in 196ms
+ ○ Compiling /contact ...
+ ✓ Compiled /contact in 9.7s (1526 modules)
+ GET /contact 200 in 11259ms
+ GET / 200 in 308ms
+ ✓ Compiled in 4.6s (1540 modules)
+ GET / 200 in 718ms
+ ✓ Compiled in 2.5s (1540 modules)
+ GET / 200 in 344ms
+ ⚠ Fast Refresh had to perform a full reload due to a runtime error.
+ ⨯ ReferenceError: activeImage is not defined
+    at eval (src\components\sections\home\Hero.tsx:124:32)
+    at Array.map (<anonymous>)
+    at Hero (src\components\sections\home\Hero.tsx:119:23)
+  122 |               className="absolute inset-0 transition-opacity duration-[1800ms] ease-out"
+  123 |               style={{
+> 124 |                 opacity: i === activeImage ? 1 : 0,
+      |                                ^
+  125 |                 backgroundImage: `linear-gradient(180deg, rgba(12,12,12,0.15) 0%, rgba(12,12,12,0.55) 100%), url(${src})`,
+  126 |                 backgroundSize: "cover",
+  127 |                 backgroundPosition: "center", {
+  digest: '1060565722'
+}
+ GET / 500 in 1169ms
+ ○ Compiling /favicon.ico ...
+ ✓ Compiled /favicon.ico in 1048ms (894 modules)
+ GET /favicon.ico 200 in 1543ms
+ GET /favicon.ico 200 in 33ms
+ ⚠ Fast Refresh had to perform a full reload due to a runtime error.
+ ⚠ Fast Refresh had to perform a full reload due to a runtime error.
+ ✓ Compiled in 3.6s (1557 modules)
+ GET / 200 in 2979ms
+ GET /favicon.ico 200 in 65ms
+ ✓ Compiled in 911ms (663 modules)
+ GET / 200 in 161ms
+ GET / 200 in 362ms
+ GET / 200 in 388ms
+ GET /gallery 200 in 405ms
+ GET /details 200 in 282ms
+ ✓ Compiled in 4.7s (1540 modules)
+ GET /details 200 in 955ms
+ ✓ Compiled in 3.5s (1540 modules)
+ GET /details 200 in 487ms
+ ✓ Compiled in 6.7s (1540 modules)
+ GET /details 200 in 578ms
+ ✓ Compiled in 708ms (663 modules)
+ GET /details 200 in 164ms
+ GET /details 200 in 1264ms
+ GET / 200 in 272ms
+ GET /gallery 200 in 473ms
+ ✓ Compiled in 4s (1540 modules)
+ GET /gallery 200 in 564ms
+ GET / 200 in 249ms
+ ✓ Compiled in 4s (1540 modules)
+ GET /gallery 200 in 732ms
+ GET / 200 in 759ms
+ ✓ Compiled in 706ms (663 modules)
+ GET / 200 in 160ms
+ GET /gallery 200 in 125ms
+ GET /gallery 200 in 1104ms
+ GET /gallery 200 in 214ms
+ ✓ Compiled in 3.3s (1540 modules)
+ GET /gallery 200 in 622ms
+ GET /gallery 200 in 116ms
+ ✓ Compiled in 2.4s (1540 modules)
+ GET /gallery 200 in 517ms
+ GET /gallery 200 in 109ms
+ ✓ Compiled in 657ms (663 modules)
+ ✓ Compiled in 876ms (663 modules)
+ GET /gallery 200 in 203ms
+ GET /gallery 200 in 120ms
+ GET /gallery 200 in 157ms
+ GET /gallery 200 in 109ms
+ GET /gallery 200 in 1366ms
+ GET / 200 in 449ms
+ ✓ Compiled in 5.1s (1540 modules)
+ GET /gallery 200 in 1105ms
+ GET / 200 in 1164ms
+ ✓ Compiled in 2.5s (1540 modules)
+ GET / 200 in 541ms
+ GET /gallery 200 in 131ms
+ ✓ Compiled in 958ms (663 modules)
+ GET /gallery 200 in 322ms
+ GET / 200 in 353ms
+ GET /gallery 200 in 3283ms
+ ✓ Compiled in 3.8s (1540 modules)
+ GET /gallery 200 in 734ms
+ ✓ Compiled in 7s (1544 modules)
+ GET /gallery 200 in 522ms
+ ✓ Compiled in 717ms (665 modules)
+ GET /gallery 200 in 170ms
+ GET /gallery 200 in 1305ms
+ GET / 200 in 401ms
+ GET / 200 in 3005ms
+ GET /gallery 200 in 368ms
+ GET /gallery 200 in 931ms
+[TypeError: fetch failed] {
+  [cause]: [Error: getaddrinfo ENOTFOUND images.unsplash.com] {
+    errno: -3008,
+    code: 'ENOTFOUND',
+    syscall: 'getaddrinfo',
+    hostname: 'images.unsplash.com'
+  }
+}
+ ○ Compiling /_error ...
+ GET / 200 in 12786ms
+[TypeError: fetch failed] {
+  [cause]: [Error: getaddrinfo ENOTFOUND images.unsplash.com] {
+    errno: -3008,
+    code: 'ENOTFOUND',
+    syscall: 'getaddrinfo',
+    hostname: 'images.unsplash.com'
+  }
+}
+[TypeError: fetch failed] {
+  [cause]: [Error: getaddrinfo ENOTFOUND images.unsplash.com] {
+    errno: -3008,
+    code: 'ENOTFOUND',
+    syscall: 'getaddrinfo',
+    hostname: 'images.unsplash.com'
+  }
+}
+[TypeError: fetch failed] {
+  [cause]: [Error: getaddrinfo ENOTFOUND images.unsplash.com] {
+    errno: -3008,
+    code: 'ENOTFOUND',
+    syscall: 'getaddrinfo',
+    hostname: 'images.unsplash.com'
+  }
+}
+[TypeError: fetch failed] {
+  [cause]: [Error: getaddrinfo ENOTFOUND images.unsplash.com] {
+    errno: -3008,
+    code: 'ENOTFOUND',
+    syscall: 'getaddrinfo',
+    hostname: 'images.unsplash.com'
+  }
+}
+[TypeError: fetch failed] {
+  [cause]: [Error: getaddrinfo ENOTFOUND images.unsplash.com] {
+    errno: -3008,
+    code: 'ENOTFOUND',
+    syscall: 'getaddrinfo',
+    hostname: 'images.unsplash.com'
+  }
+}
+ ✓ Compiled /_error in 39s (1891 modules)
+ GET /_next/image?url=https%3A%2F%2Fimages.unsplash.com%2Fphoto-1613490493576-7fde63acd811%3Fw%3D1600%26q%3D80&w=1080&q=75 500 in 45285ms
+ GET /_next/image?url=https%3A%2F%2Fimages.unsplash.com%2Fphoto-1613490493576-7fde63acd811%3Fw%3D1600%26q%3D80&w=1080&q=75 500 in 44590ms
+ GET /_next/image?url=https%3A%2F%2Fimages.unsplash.com%2Fphoto-1600210492493-0946911123ea%3Fw%3D1600%26q%3D80&w=640&q=75 500 in 16117ms
+ GET /_next/image?url=https%3A%2F%2Fimages.unsplash.com%2Fphoto-1600210492493-0946911123ea%3Fw%3D1600%26q%3D80&w=640&q=75 500 in 16091ms
+ GET /_next/image?url=https%3A%2F%2Fimages.unsplash.com%2Fphoto-1776313756952-32a2ec58d729%3Fw%3D1600%26q%3D80&w=640&q=75 500 in 16123ms
+ GET /_next/image?url=https%3A%2F%2Fimages.unsplash.com%2Fphoto-1776313756952-32a2ec58d729%3Fw%3D1600%26q%3D80&w=640&q=75 500 in 16020ms
+ GET /_next/image?url=https%3A%2F%2Fimages.unsplash.com%2Fphoto-1605270160644-d52c6515c141%3Fw%3D1600%26q%3D80&w=640&q=75 500 in 14164ms
+ GET /_next/image?url=https%3A%2F%2Fimages.unsplash.com%2Fphoto-1605270160644-d52c6515c141%3Fw%3D1600%26q%3D80&w=640&q=75 500 in 14065ms
+ GET /_next/image?url=https%3A%2F%2Fimages.unsplash.com%2Fphoto-1600210492493-0946911123ea%3Fw%3D1600%26q%3D80&w=1080&q=75 500 in 14182ms
+ GET /_next/image?url=https%3A%2F%2Fimages.unsplash.com%2Fphoto-1600210492493-0946911123ea%3Fw%3D1600%26q%3D80&w=1080&q=75 500 in 14078ms
+ GET /_next/image?url=https%3A%2F%2Fimages.unsplash.com%2Fphoto-1776313756952-32a2ec58d729%3Fw%3D1600%26q%3D80&w=1080&q=75 500 in 13956ms
+ GET /_next/image?url=https%3A%2F%2Fimages.unsplash.com%2Fphoto-1776313756952-32a2ec58d729%3Fw%3D1600%26q%3D80&w=1080&q=75 500 in 13846ms
+[TypeError: fetch failed] {
+  [cause]: [Error: getaddrinfo ENOTFOUND images.unsplash.com] {
+    errno: -3008,
+    code: 'ENOTFOUND',
+    syscall: 'getaddrinfo',
+    hostname: 'images.unsplash.com'
+  }
+}
+ GET /_next/image?url=https%3A%2F%2Fimages.unsplash.com%2Fphoto-1613490493576-7fde63acd811%3Fw%3D1600%26q%3D80&w=1080&q=75 500 in 369ms
+ GET /_next/image?url=https%3A%2F%2Fimages.unsplash.com%2Fphoto-1613490493576-7fde63acd811%3Fw%3D1600%26q%3D80&w=1080&q=75 500 in 344ms
