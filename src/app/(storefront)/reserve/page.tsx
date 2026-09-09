@@ -174,7 +174,7 @@ export default function ReservePage() {
                       <p className="font-mono text-[10px] tracking-widest text-[#c2a27c] uppercase mb-2">Book In</p>
                       <DatePicker 
                         selected={arrivalDate} 
-                        onChange={(date) => setArrivalDate(date)} 
+                        onChange={(date: Date | null) => setArrivalDate(date)} 
                         selectsStart
                         showTimeSelect
                         timeFormat="HH:mm"
@@ -203,7 +203,7 @@ export default function ReservePage() {
                       <p className="font-mono text-[10px] tracking-widest text-[#c2a27c] uppercase mb-2">Check Out</p>
                       <DatePicker 
                         selected={departureDate} 
-                        onChange={(date) => setDepartureDate(date)} 
+                        onChange={(date: Date | null) => setDepartureDate(date)} 
                         selectsEnd
                         showTimeSelect
                         timeFormat="HH:mm"
