@@ -59,6 +59,7 @@ export default function ReservePage() {
   const [children, setChildren] = useState(0);
   const [currentSlide, setCurrentSlide] = useState(0);
   const [guestName, setGuestName] = useState("");
+  const [email, setEmail] = useState("");
   const packages = useQuery(api.packages?.getPackages || (() => []));
 
   const [dateError, setDateError] = useState("");
