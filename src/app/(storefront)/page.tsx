@@ -453,13 +453,13 @@ export default function Storefront() {
           </div>
 
           {/* Card 6: Bathrooms */}
-          <div className="flex gap-8 items-center w-[85vw] md:w-[55vw] shrink-0">
-            <div className="w-1/4 shrink-0">
-              <Bath className="w-8 h-8 text-[#c2a27c] mb-6" strokeWidth={1} />
+          <div className="flex flex-col md:flex-row gap-6 md:gap-8 items-center w-[85vw] md:w-[55vw] shrink-0">
+            <div className="w-full md:w-1/4 shrink-0 text-center md:text-left">
+              <Bath className="w-8 h-8 text-[#c2a27c] mb-4 md:mb-6 mx-auto md:mx-0" strokeWidth={1} />
               <h3 className="text-2xl md:text-3xl font-serif mb-4 text-[#e8e0d4]">Modern Elegance</h3>
               <p className="text-white/60 text-sm leading-relaxed">Premium finishes and abundant natural light.</p>
             </div>
-            <div className="w-3/4 grid grid-cols-3 gap-3 shrink-0">
+            <div className="w-full md:w-3/4 grid grid-cols-3 gap-3 shrink-0">
               <div className="aspect-[3/4] relative overflow-hidden rounded-2xl border border-white/10"><Image src="/images/IMG_9265.JPG.jpeg" alt="Bath 1" fill className="object-cover" /></div>
               <div className="aspect-[3/4] relative overflow-hidden rounded-2xl border border-white/10"><Image src="/images/IMG_9266.JPG.jpeg" alt="Bath 2" fill className="object-cover" /></div>
               <div className="aspect-[3/4] relative overflow-hidden rounded-2xl border border-white/10"><Image src="/images/IMG_9267.JPG.jpeg" alt="Bath 3" fill className="object-cover" /></div>
@@ -511,10 +511,10 @@ export default function Storefront() {
       </section>
 
       {/* ACT V: The Courtyard (Gallery Finale - Fan Out Effect) */}
-      <section id="gallery" className="py-24 bg-[#100f0d] overflow-hidden">
-        <div ref={fanContainerRef} className="h-screen w-full flex flex-col items-center justify-center relative">
-          <div className="absolute top-10 text-center z-50">
-            <h2 className="text-4xl md:text-6xl font-serif font-light mb-4">The Gallery</h2>
+      <section id="gallery" className="pt-12 pb-16 md:py-24 bg-[#100f0d]">
+        <div ref={fanContainerRef} className="w-full flex flex-col items-center justify-center relative gap-8 md:gap-16">
+          <div className="text-center z-50">
+            <h2 className="text-4xl md:text-6xl font-serif font-light mb-0">The Gallery</h2>
           </div>
           
           <div className="relative w-[55vw] md:w-[25vw] aspect-[3/4] cursor-pointer group z-10"
@@ -542,7 +542,7 @@ export default function Storefront() {
         </div>
       </section>
 
-      <section id="location" className="py-24 md:py-40 px-6 md:px-12 max-w-[100rem] mx-auto">
+      <section id="location" className="pt-12 pb-24 md:py-40 px-6 md:px-12 max-w-[100rem] mx-auto">
         <div className="w-full text-center space-y-8 mb-16 slide-in">
           <MapPin className="w-8 h-8 mx-auto text-[#c2a27c]" strokeWidth={1} />
           <h2 className="text-4xl md:text-6xl font-serif font-light">Find Your Way</h2>

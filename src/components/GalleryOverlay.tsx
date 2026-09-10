@@ -87,8 +87,15 @@ export function GalleryOverlay({ isOpen, onClose }: { isOpen: boolean; onClose: 
             <Loader2 className="w-12 h-12 text-[#c2a27c] animate-spin" />
           </div>
         ) : images.length === 0 ? (
-          <div className="h-[60vh] flex items-center justify-center">
-            <p className="text-white/40 font-mono tracking-widest uppercase">No images found</p>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8 opacity-50">
+            {[1, 2, 3, 4, 5, 6].map((i) => (
+              <div 
+                key={i} 
+                className={`animate-pulse rounded-2xl bg-white/5 ${
+                  i === 1 || i === 4 ? 'aspect-[3/4] md:row-span-2' : 'aspect-video'
+                }`}
+              ></div>
+            ))}
           </div>
         ) : (
           <div className={`
