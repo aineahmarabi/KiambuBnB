@@ -17,7 +17,8 @@ import {
   Search,
   LogOut,
   Menu,
-  Box
+  Box,
+  Image as ImageIcon
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 
@@ -81,6 +82,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     { name: "Guests", href: "/admin/guests", icon: Users },
     { name: "Inquiries", href: "/admin/inquiries", icon: MessageSquare },
     { name: "Packages", href: "/admin/packages", icon: Box },
+    { name: "Gallery", href: "/admin/gallery", icon: ImageIcon },
     { name: "Settings", href: "/admin/settings", icon: Settings },
   ];
 

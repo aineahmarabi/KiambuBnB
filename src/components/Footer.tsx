@@ -99,123 +99,131 @@ export function Footer() {
 
   return (
     <>
-      <footer id="contact" className="min-h-screen flex flex-col pt-24 md:pt-32 pb-8 bg-[#0a0a0a] border-t border-white/5 relative overflow-hidden">
-        <div className="absolute inset-0 bg-[url('data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22180%22 height=%22180%22><filter id=%22n%22><feTurbulence type=%22fractalNoise%22 baseFrequency=%220.9%22 numOctaves=%222%22 stitchTiles=%22stitch%22/></filter><rect width=%22100%25%22 height=%22100%25%22 filter=%22url(%23n)%22/></svg>')] opacity-[0.03] mix-blend-overlay"></div>
+      <footer id="contact" className="flex flex-col pt-24 pb-10 bg-[#0a0a0a] border-t border-white/5 relative overflow-hidden">
+        {/* Subtle noise overlay */}
+        <div className="absolute inset-0 bg-[url('data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22180%22 height=%22180%22><filter id=%22n%22><feTurbulence type=%22fractalNoise%22 baseFrequency=%220.9%22 numOctaves=%222%22 stitchTiles=%22stitch%22/></filter><rect width=%22100%25%22 height=%22100%25%22 filter=%22url(%23n)%22/></svg>')] opacity-[0.04] mix-blend-overlay pointer-events-none z-0"></div>
         
-        <div className="flex-1 flex flex-col justify-center w-full relative z-10">
-          <div className="max-w-[100rem] w-full mx-auto px-6 md:px-12">
-            <div className="grid grid-cols-1 md:grid-cols-12 gap-8 md:gap-16">
-            
-            {/* Left: Info & Links */}
-            <div className="md:col-span-7 flex flex-col justify-between py-4 order-2 md:order-1">
-              <div>
-                <h3 className="text-5xl md:text-7xl font-serif font-light tracking-tighter mb-8 whitespace-pre-wrap">{settings === undefined ? "\u00A0" : (settings?.propertyName ? settings.propertyName.replace(" ", "\n") + "." : "Ficus and\nFigs.")}</h3>
+        {/* Decorative background glow */}
+        <div className="absolute -top-[20%] -right-[10%] w-[50%] h-[50%] bg-[#c2a27c]/10 blur-[150px] rounded-full pointer-events-none z-0"></div>
 
-                <div className="space-y-4 text-white/70 font-light mt-8">
-                  <p className="flex items-center gap-3">
-                    <MapPin className="w-4 h-4 text-[#c2a27c]" /> Kiambu Hills, Kenya
-                  </p>
-                  <a href={`mailto:${settings?.email || "info@ficusandfigs.com"}`} className="flex items-center gap-3 hover:text-[#c2a27c] transition-colors w-fit">
-                    <Mail className="w-4 h-4 text-[#c2a27c]" /> {settings?.email || "info@ficusandfigs.com"}
-                  </a>
-                  <a href={`tel:${settings?.phone ? settings.phone.replace(/\D/g,'') : "+254708443090"}`} className="flex items-center gap-3 hover:text-[#c2a27c] transition-colors w-fit">
-                    <Phone className="w-4 h-4 text-[#c2a27c]" /> {settings?.phone || "+254 708 443 090"}
-                  </a>
+        <div className="flex-1 flex flex-col w-full relative z-10 px-6 md:px-12 max-w-[100rem] mx-auto">
+          
+          {/* Top Section: Massive CTA & Minimal Form */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 lg:gap-8 items-start mb-32">
+             
+             {/* Left: The Invite */}
+             <div className="flex flex-col gap-12 pr-0 lg:pr-20">
+                <div>
+                   <h2 className="text-5xl md:text-7xl font-serif font-light leading-tight tracking-tight mb-6">
+                     Begin Your<br/><i className="text-[#c2a27c]">Sanctuary</i> Story.
+                   </h2>
+                   <p className="text-white/60 font-light text-lg md:text-xl max-w-md leading-relaxed">
+                     Whether a grand celebration or a quiet retreat, reserve your dates and let us craft an unforgettable experience.
+                   </p>
                 </div>
                 
-                <div className="flex flex-wrap gap-6 mt-10">
-                  <a href={settings?.instagram || "#"} target="_blank" rel="noopener noreferrer" className="w-12 h-12 rounded-full border border-white/10 flex items-center justify-center hover:bg-white/5 hover:border-[#c2a27c] hover:text-[#c2a27c] transition-all duration-300">
-                    <Instagram className="w-5 h-5" strokeWidth={1.5} />
-                  </a>
-                  <a href={settings?.facebook || "#"} target="_blank" rel="noopener noreferrer" className="w-12 h-12 rounded-full border border-white/10 flex items-center justify-center hover:bg-white/5 hover:border-[#c2a27c] hover:text-[#c2a27c] transition-all duration-300">
-                    <Facebook className="w-5 h-5" strokeWidth={1.5} />
-                  </a>
-                  <a href={settings?.twitter || "#"} target="_blank" rel="noopener noreferrer" className="w-12 h-12 rounded-full border border-white/10 flex items-center justify-center hover:bg-white/5 hover:border-[#c2a27c] hover:text-[#c2a27c] transition-all duration-300">
-                    <Twitter className="w-5 h-5" strokeWidth={1.5} />
-                  </a>
-                  <a href={settings?.whatsapp ? `https://wa.me/${settings.whatsapp.replace(/\D/g,'')}` : "#"} target="_blank" rel="noopener noreferrer" className="w-12 h-12 rounded-full border border-white/10 flex items-center justify-center hover:bg-white/5 hover:border-[#c2a27c] hover:text-[#c2a27c] transition-all duration-300">
-                    <WhatsappIcon className="w-5 h-5" strokeWidth={1.5} />
-                  </a>
+                <div className="flex flex-col gap-6">
+                   <div className="flex items-center gap-4 text-white/70 group w-fit">
+                      <div className="w-12 h-12 rounded-full border border-white/10 flex items-center justify-center group-hover:border-[#c2a27c] transition-colors">
+                         <Mail className="w-5 h-5 group-hover:text-[#c2a27c] transition-colors" strokeWidth={1} />
+                      </div>
+                      <a href={`mailto:${settings?.email || "info@ficusandfigs.com"}`} className="font-light tracking-wide group-hover:text-white transition-colors text-lg">
+                         {settings?.email || "info@ficusandfigs.com"}
+                      </a>
+                   </div>
+                   <div className="flex items-center gap-4 text-white/70 group w-fit">
+                      <div className="w-12 h-12 rounded-full border border-white/10 flex items-center justify-center group-hover:border-[#c2a27c] transition-colors">
+                         <Phone className="w-5 h-5 group-hover:text-[#c2a27c] transition-colors" strokeWidth={1} />
+                      </div>
+                      <a href={`tel:${settings?.phone ? settings.phone.replace(/\D/g,'') : "+254708443090"}`} className="font-light tracking-wide group-hover:text-white transition-colors text-lg">
+                         {settings?.phone || "+254 708 443 090"}
+                      </a>
+                   </div>
                 </div>
+             </div>
 
-                <div className="mt-12 flex">
-                  <Link href="/reserve" className="relative group inline-flex items-center justify-center px-6 py-3 cursor-pointer w-fit">
-                    <div className="absolute inset-0 bg-[#c2a27c] skew-x-[-15deg] transition-transform duration-500 group-hover:scale-105"></div>
-                    <span className="relative z-10 text-black font-mono uppercase tracking-[0.2em] text-[10px] font-bold">
-                      Reserve Your Space
+             {/* Right: The Elegant Form */}
+             <div className="bg-white/[0.02] border border-white/10 backdrop-blur-2xl rounded-3xl p-8 md:p-12 relative overflow-hidden">
+                <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-[#c2a27c]/50 to-transparent"></div>
+                
+                <form 
+                  className="space-y-10" 
+                  onSubmit={async (e) => {
+                    e.preventDefault();
+                    if (!email || !message) return;
+                    setIsSubmitting(true);
+                    try {
+                      await submitInquiry({ name: fullName.trim(), email, subject: "Website Inquiry", message });
+                      setSubmitSuccess(true);
+                      setFullName(""); setEmail(""); setMessage("");
+                      setTimeout(() => setSubmitSuccess(false), 5000);
+                    } catch (e) { console.error("Failed to submit", e); } 
+                    finally { setIsSubmitting(false); }
+                  }}
+                >
+                  <div className="relative group">
+                     <input type="text" id="fname" value={fullName} onChange={e=>setFullName(e.target.value)} required className="w-full bg-transparent border-b border-white/20 px-0 py-4 text-lg focus:outline-none focus:border-[#c2a27c] transition-colors text-white placeholder-transparent peer" placeholder="Full Name" />
+                     <label htmlFor="fname" className="absolute left-0 top-4 text-white/40 font-light transition-all peer-focus:-top-4 peer-focus:text-xs peer-focus:text-[#c2a27c] peer-valid:-top-4 peer-valid:text-xs peer-valid:text-[#c2a27c]">Your Name</label>
+                  </div>
+                  
+                  <div className="relative group">
+                     <input type="email" id="femail" value={email} onChange={e=>setEmail(e.target.value)} required className="w-full bg-transparent border-b border-white/20 px-0 py-4 text-lg focus:outline-none focus:border-[#c2a27c] transition-colors text-white placeholder-transparent peer" placeholder="Email" />
+                     <label htmlFor="femail" className="absolute left-0 top-4 text-white/40 font-light transition-all peer-focus:-top-4 peer-focus:text-xs peer-focus:text-[#c2a27c] peer-valid:-top-4 peer-valid:text-xs peer-valid:text-[#c2a27c]">Email Address</label>
+                  </div>
+                  
+                  <div className="relative group">
+                     <textarea id="fmsg" value={message} onChange={e=>setMessage(e.target.value)} required rows={2} className="w-full bg-transparent border-b border-white/20 px-0 py-4 text-lg focus:outline-none focus:border-[#c2a27c] transition-colors text-white placeholder-transparent peer resize-none" placeholder="Message"></textarea>
+                     <label htmlFor="fmsg" className="absolute left-0 top-4 text-white/40 font-light transition-all peer-focus:-top-4 peer-focus:text-xs peer-focus:text-[#c2a27c] peer-valid:-top-4 peer-valid:text-xs peer-valid:text-[#c2a27c]">Intended Stay Details</label>
+                  </div>
+                  
+                  <button disabled={isSubmitting || submitSuccess} className="w-full relative group overflow-hidden rounded-full px-8 py-5 flex items-center justify-center cursor-pointer border border-[#c2a27c]/50 hover:border-[#c2a27c] transition-colors disabled:opacity-50">
+                    <div className={`absolute inset-0 transition-transform duration-700 ease-out ${submitSuccess ? 'bg-green-900/40' : 'bg-[#c2a27c]/10 group-hover:bg-[#c2a27c]/20'}`}></div>
+                    <span className="relative z-10 text-white font-mono uppercase tracking-[0.2em] text-xs font-bold transition-transform duration-500 group-hover:scale-105">
+                      {submitSuccess ? "Request Submitted" : (isSubmitting ? "Sending..." : "Submit Inquiry")}
                     </span>
-                  </Link>
-                </div>
-              </div>
-
-              <div className="flex gap-8 mt-20 md:mt-0 pt-8 border-t border-white/10">
-                <button 
-                  onClick={() => openModal("Terms of Service", TOS_CONTENT)}
-                  className="font-mono text-xs uppercase tracking-widest text-white/50 hover:text-[#c2a27c] transition-colors cursor-pointer"
-                >
-                  Terms of Service
-                </button>
-                <button 
-                  onClick={() => openModal("Privacy Policy", PRIVACY_CONTENT)}
-                  className="font-mono text-xs uppercase tracking-widest text-white/50 hover:text-[#c2a27c] transition-colors cursor-pointer"
-                >
-                  Privacy Policy
-                </button>
-              </div>
-            </div>
-
-            {/* Right: Contact Form */}
-            <div className="md:col-span-5 order-1 md:order-2 backdrop-blur-md bg-white/5 border border-white/10 p-8 md:p-10 rounded-2xl">
-              <h3 className="text-3xl font-serif font-light mb-2">Inquire About a Stay</h3>
-              <p className="text-white/60 text-sm mb-8 font-light">Leave your details and we will reach out to arrange your visit.</p>
-              
-              <form 
-                className="space-y-8" 
-                onSubmit={async (e) => {
-                  e.preventDefault();
-                  if (!email || !message) return;
-                  setIsSubmitting(true);
-                  try {
-                    await submitInquiry({
-                      name: fullName.trim(),
-                      email,
-                      subject: "Website Inquiry",
-                      message
-                    });
-                    setSubmitSuccess(true);
-                    setFullName("");
-                    setEmail("");
-                    setMessage("");
-                    setTimeout(() => setSubmitSuccess(false), 5000);
-                  } catch (e) {
-                    console.error("Failed to submit", e);
-                  } finally {
-                    setIsSubmitting(false);
-                  }
-                }}
-              >
-                <div className="grid grid-cols-1 gap-8">
-                  <input type="text" value={fullName} onChange={e=>setFullName(e.target.value)} placeholder="Full Name" required className="w-full bg-transparent border-b border-white/20 px-0 py-2 text-sm focus:outline-none focus:border-[#c2a27c] transition-colors text-white placeholder-white/40" />
-                </div>
-                <input type="email" value={email} onChange={e=>setEmail(e.target.value)} placeholder="Email Address" required className="w-full bg-transparent border-b border-white/20 px-0 py-2 text-sm focus:outline-none focus:border-[#c2a27c] transition-colors text-white placeholder-white/40" />
-                <textarea value={message} onChange={e=>setMessage(e.target.value)} placeholder="Tell us about your intended stay" required rows={3} className="w-full bg-transparent border-b border-white/20 px-0 py-2 text-sm focus:outline-none focus:border-[#c2a27c] transition-colors text-white placeholder-white/40 resize-none"></textarea>
-                
-                <button disabled={isSubmitting || submitSuccess} className="relative group inline-flex items-center justify-center px-10 py-4 mt-2 w-full cursor-pointer disabled:opacity-50">
-                  <div className={`absolute inset-0 skew-x-[-15deg] transition-transform duration-500 ${submitSuccess ? 'bg-green-500' : 'bg-[#c2a27c] group-hover:scale-105'}`}></div>
-                  <span className="relative z-10 text-black font-mono uppercase tracking-[0.2em] text-xs font-bold">
-                    {submitSuccess ? "Message Sent!" : (isSubmitting ? "Sending..." : "Send Inquiry")}
-                  </span>
-                </button>
-              </form>
-            </div>
+                  </button>
+                </form>
+             </div>
           </div>
-        </div>
 
-        {/* Copyright & Bottom Spacing */}
-        <div className="mt-8 md:mt-12 pt-6 flex items-center justify-center text-center w-full border-t border-white/5 relative z-10">
-            <p className="font-mono text-[10px] tracking-[0.2em] text-white/20 uppercase">
-              &copy; {new Date().getFullYear()} Ficus and Figs. All Rights Reserved.
-            </p>
+          <div className="flex-1"></div>
+
+          {/* Bottom Section: Giant Typography & Socials */}
+          <div className="w-full flex flex-col md:flex-row items-end md:items-center justify-between border-t border-white/10 pt-10 pb-4 gap-8">
+             
+             {/* Left: Giant Brand Name */}
+             <div className="w-full md:w-auto overflow-hidden">
+                <h1 className="text-[12vw] md:text-[8vw] font-serif tracking-tighter leading-none text-white/90 whitespace-nowrap opacity-90 select-none">
+                  Ficus &amp; Figs.
+                </h1>
+             </div>
+
+             {/* Right: Socials & Policies */}
+             <div className="flex flex-col items-end gap-8 w-full md:w-auto">
+                <div className="flex gap-4">
+                  <a href={settings?.instagram || "#"} target="_blank" rel="noopener noreferrer" className="text-white/40 hover:text-[#c2a27c] hover:-translate-y-1 transition-all duration-300">
+                    <Instagram className="w-6 h-6" strokeWidth={1} />
+                  </a>
+                  <a href={settings?.facebook || "#"} target="_blank" rel="noopener noreferrer" className="text-white/40 hover:text-[#c2a27c] hover:-translate-y-1 transition-all duration-300">
+                    <Facebook className="w-6 h-6" strokeWidth={1} />
+                  </a>
+                  <a href={settings?.twitter || "#"} target="_blank" rel="noopener noreferrer" className="text-white/40 hover:text-[#c2a27c] hover:-translate-y-1 transition-all duration-300">
+                    <Twitter className="w-6 h-6" strokeWidth={1} />
+                  </a>
+                  <a href={settings?.whatsapp ? `https://wa.me/${settings.whatsapp.replace(/\D/g,'')}` : "#"} target="_blank" rel="noopener noreferrer" className="text-white/40 hover:text-[#c2a27c] hover:-translate-y-1 transition-all duration-300">
+                    <WhatsappIcon className="w-6 h-6" strokeWidth={1} />
+                  </a>
+                </div>
+
+                <div className="flex gap-6 font-mono text-[10px] uppercase tracking-widest text-white/40">
+                  <button onClick={() => openModal("Terms of Service", TOS_CONTENT)} className="hover:text-[#c2a27c] transition-colors text-right">Terms</button>
+                  <button onClick={() => openModal("Privacy Policy", PRIVACY_CONTENT)} className="hover:text-[#c2a27c] transition-colors text-right">Privacy</button>
+                </div>
+                
+                <p className="font-mono text-[9px] tracking-[0.2em] text-white/20 uppercase text-right mt-2">
+                  &copy; {new Date().getFullYear()} Ficus &amp; Figs. All Rights Reserved.
+                </p>
+             </div>
           </div>
         </div>
       </footer>

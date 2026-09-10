@@ -57,4 +57,9 @@ export default defineSchema({
     priceKES: v.number(),
     isActive: v.boolean(),
   }),
+  galleryImages: defineTable({
+    storageId: v.id("_storage"),
+    url: v.string(),
+    createdAt: v.number(),
+  }),
 });
