@@ -48,10 +48,12 @@ export default function AdminDashboard() {
          <div className="p-4 md:p-8 border border-white/10 bg-white/[0.02] rounded-xl relative overflow-hidden group">
             <div className="absolute inset-0 bg-gradient-to-br from-[#c2a27c]/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 sm:gap-0 mb-4 relative z-10">
-               <p className="font-mono text-[8px] sm:text-[10px] uppercase tracking-widest text-white/50">Total Bookings</p>
+               <p className="font-mono text-[8px] sm:text-[10px] uppercase tracking-widest text-white/50">Active Bookings</p>
                <TrendingUp className="w-4 h-4 text-[#c2a27c]" />
             </div>
-            <p className="font-serif text-3xl md:text-5xl font-light relative z-10">{bookings?.length || 0}</p>
+            <p className="font-serif text-3xl md:text-5xl font-light relative z-10">
+              {bookings?.filter((b: any) => b.status === "hosting" || b.status === "upcoming" || b.status === "confirmed").length || 0}
+            </p>
          </div>
       </div>
       

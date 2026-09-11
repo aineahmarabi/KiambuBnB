@@ -81,6 +81,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     { name: "Bookings", href: "/admin/bookings", icon: Calendar },
     { name: "Guests", href: "/admin/guests", icon: Users },
     { name: "Inquiries", href: "/admin/inquiries", icon: MessageSquare },
+    { name: "Reports", href: "/admin/reports", icon: TrendingUp },
     { name: "Packages", href: "/admin/packages", icon: Box },
     { name: "Gallery", href: "/admin/gallery", icon: ImageIcon },
     { name: "Settings", href: "/admin/settings", icon: Settings },

@@ -187,7 +187,7 @@ export function Footer() {
           </div>
 
           {/* Middle Section: Internal Links & Estate Quick Navigation */}
-          <div className="w-full border-t border-white/10 pt-10 pb-10 grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-6 gap-8 mb-12">
+          <div className="w-full border-t border-white/10 pt-10 pb-10 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-8 mb-12">
             <div className="flex flex-col gap-3">
               <span className="font-mono text-xs text-[#c2a27c] uppercase tracking-widest font-bold">The Estate</span>
               <a href="#hero" className="text-white/60 hover:text-white text-sm transition-colors font-light">The Arrival</a>
@@ -215,10 +215,6 @@ export function Footer() {
               <span className="font-mono text-xs text-[#c2a27c] uppercase tracking-widest font-bold">Reservations</span>
               <Link href="/reserve" className="text-white/60 hover:text-white text-sm transition-colors font-light">Book Your Stay</Link>
               <a href="#contact" className="text-white/60 hover:text-white text-sm transition-colors font-light">Inquire Event</a>
-            </div>
-            <div className="flex flex-col gap-3">
-              <span className="font-mono text-xs text-[#c2a27c] uppercase tracking-widest font-bold">Portal</span>
-              <Link href="/admin" className="text-white/60 hover:text-white text-sm transition-colors font-light">Admin Access</Link>
             </div>
           </div>
 
