@@ -1,363 +1,1029 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useQuery } from "convex/react";
 import { api } from "../../../../convex/_generated/api";
-import { 
-  TrendingUp, 
-  DollarSign, 
-  Users, 
-  Calendar, 
-  Download, 
-  FileSpreadsheet, 
-  ArrowUpRight, 
-  ArrowDownRight, 
-  Filter, 
-  Sparkles, 
-  PieChart, 
-  BarChart2, 
-  Clock, 
-  CheckCircle2, 
+import {
+  Download,
+  FileSpreadsheet,
+  Search,
+  Filter,
+  Calendar,
+  Users,
+  MessageSquare,
+  ChevronDown,
+  ChevronUp,
+  ChevronLeft,
+  ChevronRight,
+  ArrowUpDown,
+  Eye,
+  X,
+  Loader2,
+  DollarSign,
+  Clock,
+  CheckCircle2,
   AlertCircle,
-  Building,
-  Heart,
-  Wine,
-  Trees
+  XCircle,
+  Star,
+  Activity,
+  Printer,
 } from "lucide-react";
+
+// ─── Types ──────────────────────────────────────────────────────────
+type SortDir = "asc" | "desc";
+type ReportTab = "bookings" | "revenue" | "guests" | "inquiries";
+
+interface BookingRecord {
+  _id: string;
+  bookingId?: string;
+  guestName: string;
+  email: string;
+  adults: number;
+  children: number;
+  checkIn: number;
+  checkOut: number;
+  status: string;
+  specialRequests?: string;
+  totalPrice?: number;
+  bookingType?: string;
+  eventType?: string;
+  eventGuests?: number;
+  paymentStatus?: string;
+}
+
+// ─── Helpers ────────────────────────────────────────────────────────
+const formatDate = (ts: number) =>
+  new Date(ts).toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" });
+
+const formatKES = (amount: number) => `KES ${amount.toLocaleString()}`;
+
+const nightsBetween = (checkIn: number, checkOut: number) =>
+  Math.max(1, Math.round((checkOut - checkIn) / (1000 * 60 * 60 * 24)));
+
+const ROWS_PER_PAGE = 15;
 
 export default function AdminReportsPage() {
   const bookings = useQuery(api.bookings?.getBookings || (() => []));
   const inquiries = useQuery(api.inquiries?.getInquiries || (() => []));
-  const packages = useQuery(api.packages?.getPackages || (() => []));
+  const guests = useQuery(api.guests?.getGuests || (() => []));
 
-  const [timeRange, setTimeRange] = useState<"30d" | "7d" | "ytd" | "all">("30d");
+  const isLoading = bookings === undefined || inquiries === undefined || guests === undefined;
 
-  // Calculate Metrics from Real Data (with fallbacks if fresh setup)
-  const totalBookingsCount = bookings?.length || 0;
-  const activeBookings = bookings?.filter((b: any) => b.status === "hosting" || b.status === "upcoming" || b.status === "confirmed") || [];
-  const completedBookings = bookings?.filter((b: any) => b.status === "completed") || [];
-  
-  // Calculated financial metrics
-  const grossRevenue = bookings?.reduce((acc: number, b: any) => acc + (b.totalAmount || b.price || 850), 0) || 12450;
-  const averageDailyRate = totalBookingsCount > 0 ? Math.round(grossRevenue / totalBookingsCount) : 850;
-  const occupancyRate = 78.4; // %
-  const revPAR = Math.round(averageDailyRate * (occupancyRate / 100)); // Revenue per available room
-  const totalInquiries = inquiries?.length || 0;
-  const conversionRate = totalInquiries > 0 ? Math.round((totalBookingsCount / totalInquiries) * 100) : 42;
+  // ─── Tab state ──────────────────────────────────────────────────
+  const [activeTab, setActiveTab] = useState<ReportTab>("bookings");
 
-  // Purpose of stay distribution
-  const eventPurposes = [
-    { name: "Weddings & Ceremonies", count: 14, percentage: 35, color: "bg-[#c2a27c]" },
-    { name: "Family Vacations", count: 10, percentage: 25, color: "bg-[#9a7e5c]" },
-    { name: "Bridal Pick-Ups", count: 8, percentage: 20, color: "bg-[#6d573d]" },
-    { name: "Corporate Retreats", count: 5, percentage: 13, color: "bg-[#453624]" },
-    { name: "Private Picnics & Dining", count: 3, percentage: 7, color: "bg-[#2b2115]" },
-  ];
+  // ─── Bookings Report State ──────────────────────────────────────
+  const [bSearch, setBSearch] = useState("");
+  const [bStatusFilter, setBStatusFilter] = useState<string>("all");
+  const [bPaymentFilter, setBPaymentFilter] = useState<string>("all");
+  const [bTypeFilter, setBTypeFilter] = useState<string>("all");
+  const [bDateFrom, setBDateFrom] = useState("");
+  const [bDateTo, setBDateTo] = useState("");
+  const [bSortKey, setBSortKey] = useState<string>("checkIn");
+  const [bSortDir, setBSortDir] = useState<SortDir>("desc");
+  const [bPage, setBPage] = useState(0);
+  const [bExpandedRow, setBExpandedRow] = useState<string | null>(null);
 
-  // Monthly Revenue Breakdown Data
-  const monthlyRevenue = [
-    { month: "Apr 2026", revenue: 9400, bookings: 8 },
-    { month: "May 2026", revenue: 11200, bookings: 10 },
-    { month: "Jun 2026", revenue: 14800, bookings: 14 },
-    { month: "Jul 2026", revenue: 16500, bookings: 16 },
-    { month: "Aug 2026", revenue: 18900, bookings: 19 },
-    { month: "Sep 2026", revenue: 21400, bookings: 22 },
-  ];
+  // ─── Inquiries Report State ─────────────────────────────────────
+  const [iSearch, setISearch] = useState("");
+  const [iStatusFilter, setIStatusFilter] = useState<string>("all");
+  const [iPage, setIPage] = useState(0);
+  const [iSortKey, setISortKey] = useState<string>("createdAt");
+  const [iSortDir, setISortDir] = useState<SortDir>("desc");
+  const [iExpandedRow, setIExpandedRow] = useState<string | null>(null);
 
-  const maxMonthlyRevenue = Math.max(...monthlyRevenue.map((m) => m.revenue));
+  // ─── Guests Report State ────────────────────────────────────────
+  const [gSearch, setGSearch] = useState("");
+  const [gVipFilter, setGVipFilter] = useState<string>("all");
+  const [gPage, setGPage] = useState(0);
+  const [gSortKey, setGSortKey] = useState<string>("totalStays");
+  const [gSortDir, setGSortDir] = useState<SortDir>("desc");
 
-  // Export CSV Financial Ledger
-  const handleExportCSV = () => {
-    const headers = ["Booking ID,Guest Name,Check-In,Check-Out,Package,Status,Total Amount ($)\n"];
-    const rows = (bookings && bookings.length > 0 ? bookings : [
-      { _id: "b1", guestName: "Jane Doe", checkIn: "2026-09-15", checkOut: "2026-09-18", packageName: "Whole Estate Sanctuary", status: "upcoming", totalAmount: 2550 },
-      { _id: "b2", guestName: "Michael Smith", checkIn: "2026-09-20", checkOut: "2026-09-22", packageName: "Master En-Suite Weekend", status: "confirmed", totalAmount: 1700 },
-    ]).map((b: any) => `${b._id},"${b.guestName || b.name || "Guest"}",${b.checkIn || "2026-09-15"},${b.checkOut || "2026-09-18"},"${b.packageName || "Estate Booking"}",${b.status || "confirmed"},${b.totalAmount || b.price || 850}`);
+  // ─── Revenue Report State ──────────────────────────────────────
+  const [rGroupBy, setRGroupBy] = useState<"month" | "status" | "type">("month");
 
-    const csvContent = "data:text/csv;charset=utf-8," + headers.concat(rows).join("\n");
-    const encodedUri = encodeURI(csvContent);
+  // ─── Sort toggle helper ─────────────────────────────────────────
+  const toggleSort = (
+    key: string,
+    currentKey: string,
+    currentDir: SortDir,
+    setKey: (k: string) => void,
+    setDir: (d: SortDir) => void
+  ) => {
+    if (currentKey === key) {
+      setDir(currentDir === "asc" ? "desc" : "asc");
+    } else {
+      setKey(key);
+      setDir("desc");
+    }
+  };
+
+  // ═══════════════════════════════════════════════════════════════════
+  //  BOOKINGS REPORT — filtered, sorted, paginated
+  // ═══════════════════════════════════════════════════════════════════
+  const filteredBookings = useMemo(() => {
+    if (!bookings) return [];
+    let data = [...bookings] as BookingRecord[];
+
+    // Text search
+    if (bSearch.trim()) {
+      const q = bSearch.toLowerCase();
+      data = data.filter(
+        (b) =>
+          b.guestName.toLowerCase().includes(q) ||
+          b.email.toLowerCase().includes(q) ||
+          (b.bookingId || "").toLowerCase().includes(q) ||
+          (b.eventType || "").toLowerCase().includes(q)
+      );
+    }
+
+    // Status filter
+    if (bStatusFilter !== "all") data = data.filter((b) => b.status === bStatusFilter);
+
+    // Payment filter
+    if (bPaymentFilter !== "all") data = data.filter((b) => (b.paymentStatus || "pending") === bPaymentFilter);
+
+    // Type filter
+    if (bTypeFilter !== "all") {
+      if (bTypeFilter === "event") data = data.filter((b) => b.bookingType === "event");
+      else data = data.filter((b) => !b.bookingType || b.bookingType === "stay");
+    }
+
+    // Date range filter
+    if (bDateFrom) {
+      const from = new Date(bDateFrom).getTime();
+      data = data.filter((b) => b.checkIn >= from);
+    }
+    if (bDateTo) {
+      const to = new Date(bDateTo).getTime() + 86400000;
+      data = data.filter((b) => b.checkIn <= to);
+    }
+
+    // Sort
+    data.sort((a: any, b: any) => {
+      let aVal = a[bSortKey];
+      let bVal = b[bSortKey];
+      if (typeof aVal === "string") aVal = aVal.toLowerCase();
+      if (typeof bVal === "string") bVal = bVal.toLowerCase();
+      if (aVal < bVal) return bSortDir === "asc" ? -1 : 1;
+      if (aVal > bVal) return bSortDir === "asc" ? 1 : -1;
+      return 0;
+    });
+
+    return data;
+  }, [bookings, bSearch, bStatusFilter, bPaymentFilter, bTypeFilter, bDateFrom, bDateTo, bSortKey, bSortDir]);
+
+  const bTotalPages = Math.ceil(filteredBookings.length / ROWS_PER_PAGE);
+  const bPageData = filteredBookings.slice(bPage * ROWS_PER_PAGE, (bPage + 1) * ROWS_PER_PAGE);
+
+  // Bookings summary totals
+  const bSummary = useMemo(() => {
+    const total = filteredBookings.length;
+    const totalRevenue = filteredBookings.reduce((s, b) => s + (b.totalPrice || 0), 0);
+    const totalNights = filteredBookings.reduce((s, b) => s + nightsBetween(b.checkIn, b.checkOut), 0);
+    const totalGuests = filteredBookings.reduce((s, b) => s + b.adults + b.children, 0);
+    const confirmed = filteredBookings.filter((b) => b.paymentStatus === "confirmed").reduce((s, b) => s + (b.totalPrice || 0), 0);
+    const pending = filteredBookings.filter((b) => (b.paymentStatus || "pending") === "pending").reduce((s, b) => s + (b.totalPrice || 0), 0);
+    return { total, totalRevenue, totalNights, totalGuests, confirmed, pending };
+  }, [filteredBookings]);
+
+  // ═══════════════════════════════════════════════════════════════════
+  //  REVENUE REPORT — grouped breakdown
+  // ═══════════════════════════════════════════════════════════════════
+  const revenueData = useMemo(() => {
+    if (!bookings) return [];
+    const nonCancelled = (bookings as BookingRecord[]).filter((b) => b.status !== "cancelled");
+
+    if (rGroupBy === "month") {
+      const groups: Record<string, { label: string; count: number; revenue: number; nights: number; guests: number }> = {};
+      nonCancelled.forEach((b) => {
+        const d = new Date(b.checkIn);
+        const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
+        const label = d.toLocaleDateString("en-US", { month: "long", year: "numeric" });
+        if (!groups[key]) groups[key] = { label, count: 0, revenue: 0, nights: 0, guests: 0 };
+        groups[key].count += 1;
+        groups[key].revenue += b.totalPrice || 0;
+        groups[key].nights += nightsBetween(b.checkIn, b.checkOut);
+        groups[key].guests += b.adults + b.children;
+      });
+      return Object.entries(groups).sort((a, b) => b[0].localeCompare(a[0])).map(([, v]) => v);
+    }
+
+    if (rGroupBy === "status") {
+      const groups: Record<string, { label: string; count: number; revenue: number; nights: number; guests: number }> = {};
+      (bookings as BookingRecord[]).forEach((b) => {
+        const key = b.status;
+        if (!groups[key]) groups[key] = { label: key.charAt(0).toUpperCase() + key.slice(1), count: 0, revenue: 0, nights: 0, guests: 0 };
+        groups[key].count += 1;
+        groups[key].revenue += b.totalPrice || 0;
+        groups[key].nights += nightsBetween(b.checkIn, b.checkOut);
+        groups[key].guests += b.adults + b.children;
+      });
+      return Object.values(groups).sort((a, b) => b.revenue - a.revenue);
+    }
+
+    // Group by type
+    const groups: Record<string, { label: string; count: number; revenue: number; nights: number; guests: number }> = {};
+    nonCancelled.forEach((b) => {
+      let key = b.bookingType === "event" ? (b.eventType || "Event (Unspecified)") : "Stay";
+      if (!groups[key]) groups[key] = { label: key, count: 0, revenue: 0, nights: 0, guests: 0 };
+      groups[key].count += 1;
+      groups[key].revenue += b.totalPrice || 0;
+      groups[key].nights += nightsBetween(b.checkIn, b.checkOut);
+      groups[key].guests += b.adults + b.children + (b.eventGuests || 0);
+    });
+    return Object.values(groups).sort((a, b) => b.revenue - a.revenue);
+  }, [bookings, rGroupBy]);
+
+  const revenueTotals = useMemo(() => {
+    return revenueData.reduce(
+      (acc, r) => ({
+        count: acc.count + r.count,
+        revenue: acc.revenue + r.revenue,
+        nights: acc.nights + r.nights,
+        guests: acc.guests + r.guests,
+      }),
+      { count: 0, revenue: 0, nights: 0, guests: 0 }
+    );
+  }, [revenueData]);
+
+  // ═══════════════════════════════════════════════════════════════════
+  //  INQUIRIES REPORT — filtered, sorted, paginated
+  // ═══════════════════════════════════════════════════════════════════
+  const filteredInquiries = useMemo(() => {
+    if (!inquiries) return [];
+    let data = [...inquiries] as any[];
+
+    if (iSearch.trim()) {
+      const q = iSearch.toLowerCase();
+      data = data.filter(
+        (i) =>
+          i.name.toLowerCase().includes(q) ||
+          i.email.toLowerCase().includes(q) ||
+          i.subject.toLowerCase().includes(q) ||
+          i.message.toLowerCase().includes(q)
+      );
+    }
+
+    if (iStatusFilter !== "all") data = data.filter((i) => i.status === iStatusFilter);
+
+    data.sort((a: any, b: any) => {
+      let aVal = a[iSortKey];
+      let bVal = b[iSortKey];
+      if (typeof aVal === "string") aVal = aVal.toLowerCase();
+      if (typeof bVal === "string") bVal = bVal.toLowerCase();
+      if (aVal < bVal) return iSortDir === "asc" ? -1 : 1;
+      if (aVal > bVal) return iSortDir === "asc" ? 1 : -1;
+      return 0;
+    });
+
+    return data;
+  }, [inquiries, iSearch, iStatusFilter, iSortKey, iSortDir]);
+
+  const iTotalPages = Math.ceil(filteredInquiries.length / ROWS_PER_PAGE);
+  const iPageData = filteredInquiries.slice(iPage * ROWS_PER_PAGE, (iPage + 1) * ROWS_PER_PAGE);
+
+  // ═══════════════════════════════════════════════════════════════════
+  //  GUESTS REPORT — filtered, sorted, paginated
+  // ═══════════════════════════════════════════════════════════════════
+  const filteredGuests = useMemo(() => {
+    if (!guests) return [];
+    let data = [...guests] as any[];
+
+    if (gSearch.trim()) {
+      const q = gSearch.toLowerCase();
+      data = data.filter(
+        (g) => g.name.toLowerCase().includes(q) || g.email.toLowerCase().includes(q) || (g.phone || "").includes(q)
+      );
+    }
+
+    if (gVipFilter !== "all") {
+      if (gVipFilter === "vip") data = data.filter((g) => g.vip);
+      else if (gVipFilter === "returning") data = data.filter((g) => g.totalStays > 1);
+      else if (gVipFilter === "new") data = data.filter((g) => g.totalStays <= 1);
+    }
+
+    data.sort((a: any, b: any) => {
+      let aVal = a[gSortKey];
+      let bVal = b[gSortKey];
+      if (typeof aVal === "string") aVal = aVal.toLowerCase();
+      if (typeof bVal === "string") bVal = bVal.toLowerCase();
+      if (aVal == null) return 1;
+      if (bVal == null) return -1;
+      if (aVal < bVal) return gSortDir === "asc" ? -1 : 1;
+      if (aVal > bVal) return gSortDir === "asc" ? 1 : -1;
+      return 0;
+    });
+
+    return data;
+  }, [guests, gSearch, gVipFilter, gSortKey, gSortDir]);
+
+  const gTotalPages = Math.ceil(filteredGuests.length / ROWS_PER_PAGE);
+  const gPageData = filteredGuests.slice(gPage * ROWS_PER_PAGE, (gPage + 1) * ROWS_PER_PAGE);
+
+  // ═══════════════════════════════════════════════════════════════════
+  //  EXPORT FUNCTIONS
+  // ═══════════════════════════════════════════════════════════════════
+  const exportBookingsCSV = () => {
+    const headers = "Booking ID,Guest Name,Email,Adults,Children,Check-In,Check-Out,Nights,Type,Event Type,Status,Payment Status,Total Price (KES)\n";
+    const rows = filteredBookings
+      .map((b) =>
+        `"${b.bookingId || b._id}","${b.guestName}","${b.email}",${b.adults},${b.children},"${formatDate(b.checkIn)}","${formatDate(b.checkOut)}",${nightsBetween(b.checkIn, b.checkOut)},"${b.bookingType || "stay"}","${b.eventType || "—"}","${b.status}","${b.paymentStatus || "pending"}",${b.totalPrice || 0}`
+      )
+      .join("\n");
+    downloadCSV(headers + rows, "Bookings_Report");
+  };
+
+  const exportInquiriesCSV = () => {
+    const headers = "Name,Email,Subject,Message,Status,Date Received\n";
+    const rows = filteredInquiries
+      .map((i: any) => `"${i.name}","${i.email}","${i.subject}","${i.message.replace(/"/g, '""')}","${i.status}","${formatDate(i.createdAt)}"`)
+      .join("\n");
+    downloadCSV(headers + rows, "Inquiries_Report");
+  };
+
+  const exportGuestsCSV = () => {
+    const headers = "Name,Email,Phone,Total Stays,Last Visit,VIP\n";
+    const rows = filteredGuests
+      .map((g: any) => `"${g.name}","${g.email}","${g.phone || "—"}",${g.totalStays},"${g.lastVisit ? formatDate(g.lastVisit) : "—"}",${g.vip ? "Yes" : "No"}`)
+      .join("\n");
+    downloadCSV(headers + rows, "Guest_Report");
+  };
+
+  const exportRevenueCSV = () => {
+    const headers = `Group By: ${rGroupBy}\nPeriod/Category,Bookings,Revenue (KES),Total Nights,Total Guests\n`;
+    const rows = revenueData
+      .map((r) => `"${r.label}",${r.count},${r.revenue},${r.nights},${r.guests}`)
+      .join("\n");
+    const totals = `\n"TOTALS",${revenueTotals.count},${revenueTotals.revenue},${revenueTotals.nights},${revenueTotals.guests}`;
+    downloadCSV(headers + rows + totals, "Revenue_Report");
+  };
+
+  const downloadCSV = (content: string, name: string) => {
+    const blob = new Blob([content], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
-    link.setAttribute("href", encodedUri);
-    link.setAttribute("download", `Ficus_Figs_Financial_Report_${new Date().toISOString().slice(0, 10)}.csv`);
+    link.href = url;
+    link.download = `${name}_${new Date().toISOString().slice(0, 10)}.csv`;
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
+    URL.revokeObjectURL(url);
   };
 
-  const handlePrintPDF = () => {
-    window.print();
+  // ═══════════════════════════════════════════════════════════════════
+  //  SHARED UI COMPONENTS
+  // ═══════════════════════════════════════════════════════════════════
+  const SortHeader = ({
+    label,
+    sortKey,
+    currentKey,
+    currentDir,
+    onSort,
+    className = "",
+  }: {
+    label: string;
+    sortKey: string;
+    currentKey: string;
+    currentDir: SortDir;
+    onSort: (key: string) => void;
+    className?: string;
+  }) => (
+    <th
+      onClick={() => onSort(sortKey)}
+      className={`text-left p-3 md:p-4 font-mono text-[10px] uppercase tracking-widest text-white/40 cursor-pointer hover:text-[#c2a27c] transition-colors select-none ${className}`}
+    >
+      <div className="flex items-center gap-1.5">
+        <span>{label}</span>
+        {currentKey === sortKey ? (
+          currentDir === "asc" ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />
+        ) : (
+          <ArrowUpDown className="w-3 h-3 opacity-30" />
+        )}
+      </div>
+    </th>
+  );
+
+  const Pagination = ({
+    page,
+    totalPages,
+    totalRecords,
+    onPrev,
+    onNext,
+  }: {
+    page: number;
+    totalPages: number;
+    totalRecords: number;
+    onPrev: () => void;
+    onNext: () => void;
+  }) => (
+    <div className="flex items-center justify-between px-4 py-3 border-t border-white/10 bg-white/[0.01]">
+      <span className="font-mono text-[10px] text-white/40 uppercase tracking-widest">
+        {totalRecords} record{totalRecords !== 1 ? "s" : ""} · Page {page + 1} of {Math.max(totalPages, 1)}
+      </span>
+      <div className="flex items-center gap-2">
+        <button
+          onClick={onPrev}
+          disabled={page === 0}
+          className="p-2 rounded-lg border border-white/10 text-white/50 hover:text-white hover:border-white/30 disabled:opacity-20 disabled:cursor-not-allowed cursor-pointer transition-all"
+        >
+          <ChevronLeft className="w-4 h-4" />
+        </button>
+        <button
+          onClick={onNext}
+          disabled={page >= totalPages - 1}
+          className="p-2 rounded-lg border border-white/10 text-white/50 hover:text-white hover:border-white/30 disabled:opacity-20 disabled:cursor-not-allowed cursor-pointer transition-all"
+        >
+          <ChevronRight className="w-4 h-4" />
+        </button>
+      </div>
+    </div>
+  );
+
+  const StatusBadge = ({ status }: { status: string }) => {
+    const colors: Record<string, string> = {
+      hosting: "text-emerald-400 bg-emerald-400/10",
+      upcoming: "text-blue-400 bg-blue-400/10",
+      past: "text-white/40 bg-white/5",
+      completed: "text-white/40 bg-white/5",
+      cancelled: "text-red-400 bg-red-400/10",
+      confirmed: "text-green-400 bg-green-400/10",
+      pending: "text-yellow-400 bg-yellow-400/10",
+      unread: "text-[#c2a27c] bg-[#c2a27c]/10",
+      read: "text-white/30 bg-white/5",
+    };
+    return (
+      <span className={`px-2.5 py-1 rounded-full text-[10px] font-mono uppercase font-bold ${colors[status] || "text-white/40 bg-white/5"}`}>
+        {status}
+      </span>
+    );
   };
 
+  // ═══════════════════════════════════════════════════════════════════
+  //  LOADING STATE
+  // ═══════════════════════════════════════════════════════════════════
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-[60vh]">
+        <div className="flex flex-col items-center gap-4">
+          <Loader2 className="w-10 h-10 text-[#c2a27c] animate-spin" />
+          <p className="font-mono text-xs text-white/40 uppercase tracking-widest">Loading report data...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // ═══════════════════════════════════════════════════════════════════
+  //  RENDER
+  // ═══════════════════════════════════════════════════════════════════
   return (
-    <div className="max-w-7xl mx-auto space-y-10">
-      
-      {/* Header & Controls */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 border-b border-white/10 pb-8">
+    <div className="max-w-[90rem] mx-auto space-y-6">
+
+      {/* ─── Header ─────────────────────────────────────────────────── */}
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-white/10 pb-6">
         <div>
-          <div className="flex items-center gap-3 text-[#c2a27c] font-mono text-xs uppercase tracking-[0.3em] mb-2">
-            <Sparkles className="w-4 h-4" />
-            <span>Executive Business Analytics</span>
-          </div>
-          <h1 className="text-4xl md:text-5xl font-serif font-light text-white">Comprehensive Performance Reports</h1>
-          <p className="text-white/50 text-sm mt-2 font-light max-w-xl">
-            Real-time financial ledgers, occupancy metrics, booking conversions, and yield management analytics.
+          <h1 className="text-3xl md:text-4xl font-serif font-light text-white">Reports</h1>
+          <p className="text-white/40 text-sm mt-1 font-light">
+            Detailed logs, financial ledgers, and data tables from live records.
           </p>
         </div>
+        <button
+          onClick={() => window.print()}
+          className="px-5 py-2.5 rounded-full border border-white/20 hover:border-[#c2a27c] text-white text-xs font-mono uppercase tracking-widest transition-all flex items-center gap-2 cursor-pointer"
+        >
+          <Printer className="w-4 h-4" />
+          <span>Print</span>
+        </button>
+      </div>
 
-        {/* Time Filter & Export Actions */}
-        <div className="flex flex-wrap items-center gap-3">
-          <div className="flex items-center bg-white/5 border border-white/10 rounded-full p-1 text-xs font-mono uppercase tracking-wider">
-            {(["7d", "30d", "ytd", "all"] as const).map((range) => (
-              <button
-                key={range}
-                onClick={() => setTimeRange(range)}
-                className={`px-4 py-2 rounded-full transition-all cursor-pointer ${
-                  timeRange === range ? "bg-[#c2a27c] text-black font-bold shadow-md" : "text-white/60 hover:text-white"
-                }`}
-              >
-                {range === "7d" && "7 Days"}
-                {range === "30d" && "30 Days"}
-                {range === "ytd" && "2026 YTD"}
-                {range === "all" && "All Time"}
-              </button>
-            ))}
-          </div>
-
+      {/* ─── Report Tabs ────────────────────────────────────────────── */}
+      <div className="flex items-center gap-1 bg-white/[0.03] border border-white/10 rounded-xl p-1.5 overflow-x-auto">
+        {([
+          { id: "bookings" as ReportTab, label: "Bookings Ledger", icon: Calendar, count: bookings?.length || 0 },
+          { id: "revenue" as ReportTab, label: "Revenue Breakdown", icon: DollarSign, count: null },
+          { id: "guests" as ReportTab, label: "Guest Directory", icon: Users, count: guests?.length || 0 },
+          { id: "inquiries" as ReportTab, label: "Inquiry Log", icon: MessageSquare, count: inquiries?.length || 0 },
+        ]).map((tab) => (
           <button
-            onClick={handleExportCSV}
-            className="px-5 py-2.5 rounded-full border border-white/20 hover:border-[#c2a27c] bg-white/5 hover:bg-[#c2a27c] hover:text-black text-white text-xs font-mono uppercase tracking-widest transition-all duration-300 flex items-center gap-2 cursor-pointer shadow-lg"
-            title="Export CSV Ledger"
+            key={tab.id}
+            onClick={() => setActiveTab(tab.id)}
+            className={`flex items-center gap-2.5 px-5 py-3 rounded-lg font-mono text-xs uppercase tracking-widest transition-all cursor-pointer whitespace-nowrap ${
+              activeTab === tab.id
+                ? "bg-[#c2a27c] text-black font-bold shadow-lg"
+                : "text-white/50 hover:text-white hover:bg-white/5"
+            }`}
           >
-            <FileSpreadsheet className="w-4 h-4" />
-            <span>Export CSV</span>
+            <tab.icon className="w-4 h-4" />
+            <span>{tab.label}</span>
+            {tab.count !== null && (
+              <span className={`px-2 py-0.5 rounded-full text-[9px] font-bold ${
+                activeTab === tab.id ? "bg-black/20 text-black" : "bg-white/10 text-white/40"
+              }`}>
+                {tab.count}
+              </span>
+            )}
           </button>
-
-          <button
-            onClick={handlePrintPDF}
-            className="px-5 py-2.5 rounded-full bg-[#c2a27c] text-black font-mono text-xs uppercase tracking-widest font-bold hover:scale-105 transition-transform flex items-center gap-2 cursor-pointer shadow-lg"
-          >
-            <Download className="w-4 h-4" />
-            <span>PDF Report</span>
-          </button>
-        </div>
+        ))}
       </div>
 
-      {/* AI EXECUTIVE SUMMARY HIGHLIGHT BANNER */}
-      <div className="bg-gradient-to-r from-[#1c1813] via-[#14120e] to-[#0d0c0a] border border-[#c2a27c]/30 rounded-2xl p-6 md:p-8 relative overflow-hidden shadow-2xl">
-        <div className="absolute top-0 right-0 w-64 h-64 bg-[#c2a27c]/10 rounded-full blur-[100px] pointer-events-none"></div>
-        <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6 relative z-10">
-          <div className="space-y-2 max-w-3xl">
-            <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-[#c2a27c] bg-[#c2a27c]/10 px-3 py-1 rounded-full border border-[#c2a27c]/20">
-              Executive Digest
-            </span>
-            <h2 className="text-2xl md:text-3xl font-serif text-white font-light">
-              Estate Performance Operating at <span className="text-[#c2a27c] font-normal">78.4% Peak Capacity</span>
-            </h2>
-            <p className="text-white/70 font-light text-sm leading-relaxed">
-              Gross revenue is trending <strong className="text-green-400 font-medium">+18.2% higher</strong> month-over-month. High demand is driven primarily by weekend wedding receptions and full-estate family retreats in Kiambu.
-            </p>
-          </div>
-          <div className="flex items-center gap-6 border-t md:border-t-0 md:border-l border-white/10 pt-4 md:pt-0 md:pl-8 shrink-0">
-            <div>
-              <p className="font-mono text-[10px] uppercase tracking-widest text-white/40">Avg Length of Stay</p>
-              <p className="font-serif text-3xl text-[#e8e0d4]">3.2 Nights</p>
-            </div>
-            <div>
-              <p className="font-mono text-[10px] uppercase tracking-widest text-white/40">Lead Conversion</p>
-              <p className="font-serif text-3xl text-green-400">{conversionRate}%</p>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* EXECUTIVE KPI METRICS GRID */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
-        
-        {/* Gross Revenue */}
-        <div className="p-6 md:p-8 border border-white/10 bg-white/[0.02] rounded-2xl relative overflow-hidden group hover:border-[#c2a27c]/40 transition-colors">
-          <div className="flex items-center justify-between mb-4">
-            <span className="font-mono text-[10px] uppercase tracking-widest text-white/40">Gross Revenue</span>
-            <div className="w-10 h-10 rounded-full bg-[#c2a27c]/10 flex items-center justify-center text-[#c2a27c]">
-              <DollarSign className="w-5 h-5" />
-            </div>
-          </div>
-          <p className="font-serif text-3xl md:text-5xl font-light text-white mb-2">${grossRevenue.toLocaleString()}</p>
-          <div className="flex items-center gap-1.5 text-green-400 text-xs font-mono">
-            <ArrowUpRight className="w-4 h-4" />
-            <span>+18.2% vs previous period</span>
-          </div>
-        </div>
-
-        {/* ADR (Average Daily Rate) */}
-        <div className="p-6 md:p-8 border border-white/10 bg-white/[0.02] rounded-2xl relative overflow-hidden group hover:border-[#c2a27c]/40 transition-colors">
-          <div className="flex items-center justify-between mb-4">
-            <span className="font-mono text-[10px] uppercase tracking-widest text-white/40">ADR (Daily Rate)</span>
-            <div className="w-10 h-10 rounded-full bg-[#c2a27c]/10 flex items-center justify-center text-[#c2a27c]">
-              <TrendingUp className="w-5 h-5" />
-            </div>
-          </div>
-          <p className="font-serif text-3xl md:text-5xl font-light text-white mb-2">${averageDailyRate}</p>
-          <div className="flex items-center gap-1.5 text-green-400 text-xs font-mono">
-            <ArrowUpRight className="w-4 h-4" />
-            <span>+$45 yield optimization</span>
-          </div>
-        </div>
-
-        {/* RevPAR */}
-        <div className="p-6 md:p-8 border border-white/10 bg-white/[0.02] rounded-2xl relative overflow-hidden group hover:border-[#c2a27c]/40 transition-colors">
-          <div className="flex items-center justify-between mb-4">
-            <span className="font-mono text-[10px] uppercase tracking-widest text-white/40">RevPAR</span>
-            <div className="w-10 h-10 rounded-full bg-[#c2a27c]/10 flex items-center justify-center text-[#c2a27c]">
-              <BarChart2 className="w-5 h-5" />
-            </div>
-          </div>
-          <p className="font-serif text-3xl md:text-5xl font-light text-white mb-2">${revPAR}</p>
-          <div className="flex items-center gap-1.5 text-green-400 text-xs font-mono">
-            <ArrowUpRight className="w-4 h-4" />
-            <span>+12.4% room efficiency</span>
-          </div>
-        </div>
-
-        {/* Active Bookings Count */}
-        <div className="p-6 md:p-8 border border-white/10 bg-white/[0.02] rounded-2xl relative overflow-hidden group hover:border-[#c2a27c]/40 transition-colors">
-          <div className="flex items-center justify-between mb-4">
-            <span className="font-mono text-[10px] uppercase tracking-widest text-white/40">Active Bookings</span>
-            <div className="w-10 h-10 rounded-full bg-[#c2a27c]/10 flex items-center justify-center text-[#c2a27c]">
-              <Calendar className="w-5 h-5" />
-            </div>
-          </div>
-          <p className="font-serif text-3xl md:text-5xl font-light text-white mb-2">{activeBookings.length}</p>
-          <div className="flex items-center gap-1.5 text-white/50 text-xs font-mono">
-            <span>{totalBookingsCount} total all-time</span>
-          </div>
-        </div>
-      </div>
-
-      {/* FINANCIAL GROWTH & MONTHLY REVENUE VISUALIZATION */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-        
-        {/* Monthly Revenue Bar Chart */}
-        <div className="lg:col-span-8 bg-white/[0.02] border border-white/10 rounded-2xl p-6 md:p-8 space-y-8">
-          <div className="flex items-center justify-between border-b border-white/10 pb-4">
-            <div>
-              <h3 className="font-serif text-2xl text-white">Monthly Revenue Trajectory</h3>
-              <p className="text-white/40 text-xs font-mono mt-1">LODGING &amp; EVENT VENUE EARNINGS ($)</p>
-            </div>
-            <span className="font-mono text-xs text-[#c2a27c] bg-[#c2a27c]/10 px-3 py-1 rounded-full uppercase tracking-widest">
-              6-Month Trend
-            </span>
-          </div>
-
-          <div className="h-[280px] flex items-end justify-between gap-4 pt-6 px-2">
-            {monthlyRevenue.map((data, idx) => {
-              const heightPercent = Math.round((data.revenue / maxMonthlyRevenue) * 100);
-              return (
-                <div key={idx} className="flex-1 flex flex-col items-center gap-3 group h-full justify-end">
-                  <div className="text-center opacity-0 group-hover:opacity-100 transition-opacity mb-1">
-                    <span className="font-mono text-xs text-[#c2a27c] font-bold block">${data.revenue.toLocaleString()}</span>
-                    <span className="font-mono text-[9px] text-white/40 block">{data.bookings} bookings</span>
-                  </div>
-                  <div className="w-full max-w-[48px] bg-white/5 rounded-t-xl overflow-hidden h-full flex items-end">
-                    <div
-                      className="w-full bg-gradient-to-t from-[#6d573d] via-[#9a7e5c] to-[#c2a27c] group-hover:brightness-125 transition-all duration-500 rounded-t-xl"
-                      style={{ height: `${heightPercent}%` }}
-                    />
-                  </div>
-                  <span className="font-mono text-[10px] uppercase text-white/50">{data.month}</span>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-
-        {/* Event Purpose Distribution Pie / Breakdown */}
-        <div className="lg:col-span-4 bg-white/[0.02] border border-white/10 rounded-2xl p-6 md:p-8 space-y-6">
-          <div className="border-b border-white/10 pb-4">
-            <h3 className="font-serif text-2xl text-white">Guest Purpose Breakdown</h3>
-            <p className="text-white/40 text-xs font-mono mt-1">RESERVATION INTENTIONS (%)</p>
-          </div>
-
-          <div className="space-y-5">
-            {eventPurposes.map((item, idx) => (
-              <div key={idx} className="space-y-2">
-                <div className="flex justify-between text-xs font-mono">
-                  <span className="text-white/80">{item.name}</span>
-                  <span className="text-[#c2a27c] font-bold">{item.percentage}% ({item.count})</span>
-                </div>
-                <div className="w-full h-2 bg-white/5 rounded-full overflow-hidden">
-                  <div className={`h-full ${item.color} rounded-full`} style={{ width: `${item.percentage}%` }} />
-                </div>
+      {/* ═══════════════════════════════════════════════════════════════
+          BOOKINGS LEDGER TAB
+      ═══════════════════════════════════════════════════════════════ */}
+      {activeTab === "bookings" && (
+        <div className="space-y-4">
+          {/* Filters Bar */}
+          <div className="bg-white/[0.02] border border-white/10 rounded-xl p-4 space-y-4">
+            <div className="flex flex-col lg:flex-row lg:items-center gap-3">
+              {/* Search */}
+              <div className="relative flex-1">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/30" />
+                <input
+                  type="text"
+                  value={bSearch}
+                  onChange={(e) => { setBSearch(e.target.value); setBPage(0); }}
+                  placeholder="Search by guest name, email, booking ID..."
+                  className="w-full pl-10 pr-4 py-2.5 bg-white/5 border border-white/10 rounded-lg text-sm text-white placeholder-white/30 focus:outline-none focus:border-[#c2a27c]/50 transition-colors"
+                />
+                {bSearch && (
+                  <button onClick={() => setBSearch("")} className="absolute right-3 top-1/2 -translate-y-1/2 text-white/30 hover:text-white cursor-pointer">
+                    <X className="w-4 h-4" />
+                  </button>
+                )}
               </div>
-            ))}
+
+              {/* Status Filter */}
+              <select
+                value={bStatusFilter}
+                onChange={(e) => { setBStatusFilter(e.target.value); setBPage(0); }}
+                className="px-3 py-2.5 bg-white/5 border border-white/10 rounded-lg text-xs font-mono text-white uppercase tracking-wider cursor-pointer focus:outline-none focus:border-[#c2a27c]/50 appearance-none"
+              >
+                <option value="all">All Statuses</option>
+                <option value="hosting">Hosting</option>
+                <option value="upcoming">Upcoming</option>
+                <option value="past">Past</option>
+                <option value="cancelled">Cancelled</option>
+              </select>
+
+              {/* Payment Filter */}
+              <select
+                value={bPaymentFilter}
+                onChange={(e) => { setBPaymentFilter(e.target.value); setBPage(0); }}
+                className="px-3 py-2.5 bg-white/5 border border-white/10 rounded-lg text-xs font-mono text-white uppercase tracking-wider cursor-pointer focus:outline-none focus:border-[#c2a27c]/50 appearance-none"
+              >
+                <option value="all">All Payments</option>
+                <option value="confirmed">Confirmed</option>
+                <option value="pending">Pending</option>
+              </select>
+
+              {/* Type Filter */}
+              <select
+                value={bTypeFilter}
+                onChange={(e) => { setBTypeFilter(e.target.value); setBPage(0); }}
+                className="px-3 py-2.5 bg-white/5 border border-white/10 rounded-lg text-xs font-mono text-white uppercase tracking-wider cursor-pointer focus:outline-none focus:border-[#c2a27c]/50 appearance-none"
+              >
+                <option value="all">All Types</option>
+                <option value="stay">Stays</option>
+                <option value="event">Events</option>
+              </select>
+
+              {/* Date Range */}
+              <div className="flex items-center gap-2">
+                <input
+                  type="date"
+                  value={bDateFrom}
+                  onChange={(e) => { setBDateFrom(e.target.value); setBPage(0); }}
+                  className="px-3 py-2.5 bg-white/5 border border-white/10 rounded-lg text-xs font-mono text-white cursor-pointer focus:outline-none focus:border-[#c2a27c]/50"
+                />
+                <span className="text-white/30 text-xs">to</span>
+                <input
+                  type="date"
+                  value={bDateTo}
+                  onChange={(e) => { setBDateTo(e.target.value); setBPage(0); }}
+                  className="px-3 py-2.5 bg-white/5 border border-white/10 rounded-lg text-xs font-mono text-white cursor-pointer focus:outline-none focus:border-[#c2a27c]/50"
+                />
+              </div>
+
+              {/* Export */}
+              <button
+                onClick={exportBookingsCSV}
+                className="px-4 py-2.5 rounded-lg bg-[#c2a27c] text-black text-xs font-mono uppercase tracking-widest font-bold hover:scale-105 transition-transform flex items-center gap-2 cursor-pointer shadow-lg whitespace-nowrap"
+              >
+                <FileSpreadsheet className="w-4 h-4" />
+                <span>Export CSV</span>
+              </button>
+            </div>
+
+            {/* Active Filters Summary */}
+            {(bSearch || bStatusFilter !== "all" || bPaymentFilter !== "all" || bTypeFilter !== "all" || bDateFrom || bDateTo) && (
+              <div className="flex items-center gap-2 flex-wrap">
+                <Filter className="w-3.5 h-3.5 text-[#c2a27c]" />
+                <span className="font-mono text-[10px] text-white/40 uppercase tracking-widest">Active filters:</span>
+                {bSearch && <span className="px-2 py-0.5 bg-[#c2a27c]/10 text-[#c2a27c] text-[10px] font-mono rounded-full">&quot;{bSearch}&quot;</span>}
+                {bStatusFilter !== "all" && <span className="px-2 py-0.5 bg-blue-400/10 text-blue-400 text-[10px] font-mono rounded-full uppercase">{bStatusFilter}</span>}
+                {bPaymentFilter !== "all" && <span className="px-2 py-0.5 bg-green-400/10 text-green-400 text-[10px] font-mono rounded-full uppercase">{bPaymentFilter}</span>}
+                {bTypeFilter !== "all" && <span className="px-2 py-0.5 bg-purple-400/10 text-purple-400 text-[10px] font-mono rounded-full uppercase">{bTypeFilter}</span>}
+                {(bDateFrom || bDateTo) && <span className="px-2 py-0.5 bg-white/5 text-white/50 text-[10px] font-mono rounded-full">{bDateFrom || "..."} → {bDateTo || "..."}</span>}
+                <span className="font-mono text-[10px] text-white/30">· {filteredBookings.length} results</span>
+                <button
+                  onClick={() => { setBSearch(""); setBStatusFilter("all"); setBPaymentFilter("all"); setBTypeFilter("all"); setBDateFrom(""); setBDateTo(""); setBPage(0); }}
+                  className="text-red-400/60 hover:text-red-400 text-[10px] font-mono cursor-pointer ml-2"
+                >
+                  Clear All
+                </button>
+              </div>
+            )}
           </div>
 
-          <div className="pt-4 border-t border-white/10 text-xs text-white/40 font-light leading-relaxed">
-            💡 <strong>Insight:</strong> Weddings and Bridal Pick-Ups account for over 55% of all bookings. Consider bundling weekend venue catering packages.
+          {/* Summary Totals Row */}
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
+            <div className="p-4 bg-white/[0.02] border border-white/10 rounded-xl">
+              <p className="font-mono text-[9px] uppercase tracking-widest text-white/40 mb-1">Records</p>
+              <p className="font-serif text-2xl text-white">{bSummary.total}</p>
+            </div>
+            <div className="p-4 bg-white/[0.02] border border-white/10 rounded-xl">
+              <p className="font-mono text-[9px] uppercase tracking-widest text-white/40 mb-1">Total Revenue</p>
+              <p className="font-serif text-2xl text-white">{formatKES(bSummary.totalRevenue)}</p>
+            </div>
+            <div className="p-4 bg-white/[0.02] border border-white/10 rounded-xl">
+              <p className="font-mono text-[9px] uppercase tracking-widest text-white/40 mb-1">Confirmed</p>
+              <p className="font-serif text-2xl text-green-400">{formatKES(bSummary.confirmed)}</p>
+            </div>
+            <div className="p-4 bg-white/[0.02] border border-white/10 rounded-xl">
+              <p className="font-mono text-[9px] uppercase tracking-widest text-white/40 mb-1">Pending</p>
+              <p className="font-serif text-2xl text-yellow-400">{formatKES(bSummary.pending)}</p>
+            </div>
+            <div className="p-4 bg-white/[0.02] border border-white/10 rounded-xl">
+              <p className="font-mono text-[9px] uppercase tracking-widest text-white/40 mb-1">Total Nights</p>
+              <p className="font-serif text-2xl text-white">{bSummary.totalNights}</p>
+            </div>
+            <div className="p-4 bg-white/[0.02] border border-white/10 rounded-xl">
+              <p className="font-mono text-[9px] uppercase tracking-widest text-white/40 mb-1">Total Guests</p>
+              <p className="font-serif text-2xl text-white">{bSummary.totalGuests}</p>
+            </div>
+          </div>
+
+          {/* Data Table */}
+          <div className="bg-white/[0.02] border border-white/10 rounded-xl overflow-hidden">
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="border-b border-white/10 bg-white/[0.03]">
+                    <th className="w-8 p-3"></th>
+                    <SortHeader label="ID" sortKey="bookingId" currentKey={bSortKey} currentDir={bSortDir} onSort={(k) => toggleSort(k, bSortKey, bSortDir, setBSortKey, setBSortDir)} />
+                    <SortHeader label="Guest" sortKey="guestName" currentKey={bSortKey} currentDir={bSortDir} onSort={(k) => toggleSort(k, bSortKey, bSortDir, setBSortKey, setBSortDir)} />
+                    <SortHeader label="Check-In" sortKey="checkIn" currentKey={bSortKey} currentDir={bSortDir} onSort={(k) => toggleSort(k, bSortKey, bSortDir, setBSortKey, setBSortDir)} className="hidden md:table-cell" />
+                    <SortHeader label="Check-Out" sortKey="checkOut" currentKey={bSortKey} currentDir={bSortDir} onSort={(k) => toggleSort(k, bSortKey, bSortDir, setBSortKey, setBSortDir)} className="hidden md:table-cell" />
+                    <th className="text-left p-3 md:p-4 font-mono text-[10px] uppercase tracking-widest text-white/40 hidden lg:table-cell">Nights</th>
+                    <th className="text-left p-3 md:p-4 font-mono text-[10px] uppercase tracking-widest text-white/40 hidden lg:table-cell">Pax</th>
+                    <th className="text-left p-3 md:p-4 font-mono text-[10px] uppercase tracking-widest text-white/40">Status</th>
+                    <th className="text-left p-3 md:p-4 font-mono text-[10px] uppercase tracking-widest text-white/40 hidden md:table-cell">Payment</th>
+                    <SortHeader label="Amount" sortKey="totalPrice" currentKey={bSortKey} currentDir={bSortDir} onSort={(k) => toggleSort(k, bSortKey, bSortDir, setBSortKey, setBSortDir)} className="text-right" />
+                  </tr>
+                </thead>
+                <tbody>
+                  {bPageData.length === 0 ? (
+                    <tr>
+                      <td colSpan={10} className="p-12 text-center text-white/30 font-light">
+                        No booking records match your filters.
+                      </td>
+                    </tr>
+                  ) : (
+                    bPageData.map((b) => (
+                      <>
+                        <tr
+                          key={b._id}
+                          onClick={() => setBExpandedRow(bExpandedRow === b._id ? null : b._id)}
+                          className="border-b border-white/5 hover:bg-white/[0.03] transition-colors cursor-pointer"
+                        >
+                          <td className="p-3 text-white/30">
+                            {bExpandedRow === b._id ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+                          </td>
+                          <td className="p-3 font-mono text-xs text-[#c2a27c] whitespace-nowrap">{b.bookingId || b._id.slice(-6)}</td>
+                          <td className="p-3">
+                            <p className="font-serif text-white text-sm">{b.guestName}</p>
+                            <p className="font-mono text-[10px] text-white/30 mt-0.5">{b.email}</p>
+                          </td>
+                          <td className="p-3 font-mono text-xs text-white/60 hidden md:table-cell whitespace-nowrap">{formatDate(b.checkIn)}</td>
+                          <td className="p-3 font-mono text-xs text-white/60 hidden md:table-cell whitespace-nowrap">{formatDate(b.checkOut)}</td>
+                          <td className="p-3 font-mono text-xs text-white/60 hidden lg:table-cell">{nightsBetween(b.checkIn, b.checkOut)}</td>
+                          <td className="p-3 font-mono text-xs text-white/60 hidden lg:table-cell">{b.adults + b.children}</td>
+                          <td className="p-3"><StatusBadge status={b.status} /></td>
+                          <td className="p-3 hidden md:table-cell"><StatusBadge status={b.paymentStatus || "pending"} /></td>
+                          <td className="p-3 text-right font-mono text-sm font-bold text-white whitespace-nowrap">
+                            {b.totalPrice ? formatKES(b.totalPrice) : "—"}
+                          </td>
+                        </tr>
+                        {/* Drill-down expanded row */}
+                        {bExpandedRow === b._id && (
+                          <tr key={`${b._id}-detail`} className="bg-white/[0.02]">
+                            <td colSpan={10} className="p-6">
+                              <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4 text-xs">
+                                <div>
+                                  <p className="font-mono text-[9px] uppercase tracking-widest text-white/30 mb-1">Booking ID</p>
+                                  <p className="text-white font-mono">{b.bookingId || b._id}</p>
+                                </div>
+                                <div>
+                                  <p className="font-mono text-[9px] uppercase tracking-widest text-white/30 mb-1">Email</p>
+                                  <p className="text-white">{b.email}</p>
+                                </div>
+                                <div>
+                                  <p className="font-mono text-[9px] uppercase tracking-widest text-white/30 mb-1">Adults / Children</p>
+                                  <p className="text-white">{b.adults} adults, {b.children} children</p>
+                                </div>
+                                <div>
+                                  <p className="font-mono text-[9px] uppercase tracking-widest text-white/30 mb-1">Booking Type</p>
+                                  <p className="text-white capitalize">{b.bookingType || "Stay"}</p>
+                                </div>
+                                {b.eventType && (
+                                  <div>
+                                    <p className="font-mono text-[9px] uppercase tracking-widest text-white/30 mb-1">Event Type</p>
+                                    <p className="text-white">{b.eventType}</p>
+                                  </div>
+                                )}
+                                {b.eventGuests && (
+                                  <div>
+                                    <p className="font-mono text-[9px] uppercase tracking-widest text-white/30 mb-1">Event Guests</p>
+                                    <p className="text-white">{b.eventGuests}</p>
+                                  </div>
+                                )}
+                                <div>
+                                  <p className="font-mono text-[9px] uppercase tracking-widest text-white/30 mb-1">Duration</p>
+                                  <p className="text-white">{nightsBetween(b.checkIn, b.checkOut)} night{nightsBetween(b.checkIn, b.checkOut) !== 1 ? "s" : ""}</p>
+                                </div>
+                                <div>
+                                  <p className="font-mono text-[9px] uppercase tracking-widest text-white/30 mb-1">Check-In</p>
+                                  <p className="text-white">{new Date(b.checkIn).toLocaleString("en-GB", { dateStyle: "full" })}</p>
+                                </div>
+                                <div>
+                                  <p className="font-mono text-[9px] uppercase tracking-widest text-white/30 mb-1">Check-Out</p>
+                                  <p className="text-white">{new Date(b.checkOut).toLocaleString("en-GB", { dateStyle: "full" })}</p>
+                                </div>
+                                {b.specialRequests && (
+                                  <div className="col-span-2 md:col-span-4 lg:col-span-6">
+                                    <p className="font-mono text-[9px] uppercase tracking-widest text-white/30 mb-1">Special Requests</p>
+                                    <p className="text-white/70 italic">&ldquo;{b.specialRequests}&rdquo;</p>
+                                  </div>
+                                )}
+                              </div>
+                            </td>
+                          </tr>
+                        )}
+                      </>
+                    ))
+                  )}
+                </tbody>
+              </table>
+            </div>
+            <Pagination page={bPage} totalPages={bTotalPages} totalRecords={filteredBookings.length} onPrev={() => setBPage((p) => Math.max(0, p - 1))} onNext={() => setBPage((p) => Math.min(bTotalPages - 1, p + 1))} />
           </div>
         </div>
-      </div>
+      )}
 
-      {/* SANCTUARY ROOM PERFORMANCE & FINANCIAL LEDGER */}
-      <div className="bg-white/[0.02] border border-white/10 rounded-2xl p-6 md:p-8 space-y-6">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-white/10 pb-6">
-          <div>
-            <h3 className="font-serif text-2xl text-white">Accommodation Performance Breakdown</h3>
-            <p className="text-white/40 text-xs font-mono mt-1">REVENUE BY SUITE CATEGORY</p>
+      {/* ═══════════════════════════════════════════════════════════════
+          REVENUE BREAKDOWN TAB
+      ═══════════════════════════════════════════════════════════════ */}
+      {activeTab === "revenue" && (
+        <div className="space-y-4">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div className="flex items-center gap-2">
+              <span className="font-mono text-[10px] uppercase tracking-widest text-white/40">Group by:</span>
+              {(["month", "status", "type"] as const).map((g) => (
+                <button
+                  key={g}
+                  onClick={() => setRGroupBy(g)}
+                  className={`px-4 py-2 rounded-lg font-mono text-xs uppercase tracking-widest transition-all cursor-pointer ${
+                    rGroupBy === g ? "bg-[#c2a27c] text-black font-bold" : "bg-white/5 text-white/50 hover:text-white border border-white/10"
+                  }`}
+                >
+                  {g}
+                </button>
+              ))}
+            </div>
+            <button
+              onClick={exportRevenueCSV}
+              className="px-4 py-2.5 rounded-lg bg-[#c2a27c] text-black text-xs font-mono uppercase tracking-widest font-bold hover:scale-105 transition-transform flex items-center gap-2 cursor-pointer"
+            >
+              <FileSpreadsheet className="w-4 h-4" />
+              <span>Export CSV</span>
+            </button>
           </div>
-          <span className="font-mono text-xs text-white/60">3 Active Categories</span>
+
+          <div className="bg-white/[0.02] border border-white/10 rounded-xl overflow-hidden">
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="border-b border-white/10 bg-white/[0.03]">
+                    <th className="text-left p-4 font-mono text-[10px] uppercase tracking-widest text-white/40">{rGroupBy === "month" ? "Period" : rGroupBy === "status" ? "Status" : "Category"}</th>
+                    <th className="text-right p-4 font-mono text-[10px] uppercase tracking-widest text-white/40">Bookings</th>
+                    <th className="text-right p-4 font-mono text-[10px] uppercase tracking-widest text-white/40">Revenue (KES)</th>
+                    <th className="text-right p-4 font-mono text-[10px] uppercase tracking-widest text-white/40 hidden md:table-cell">Nights</th>
+                    <th className="text-right p-4 font-mono text-[10px] uppercase tracking-widest text-white/40 hidden md:table-cell">Guests</th>
+                    <th className="text-right p-4 font-mono text-[10px] uppercase tracking-widest text-white/40 hidden lg:table-cell">Avg / Booking</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {revenueData.length === 0 ? (
+                    <tr><td colSpan={6} className="p-12 text-center text-white/30">No revenue data available.</td></tr>
+                  ) : (
+                    revenueData.map((r, idx) => (
+                      <tr key={idx} className="border-b border-white/5 hover:bg-white/[0.03] transition-colors">
+                        <td className="p-4 font-serif text-white">{r.label}</td>
+                        <td className="p-4 text-right font-mono text-white/70">{r.count}</td>
+                        <td className="p-4 text-right font-mono text-white font-bold">{formatKES(r.revenue)}</td>
+                        <td className="p-4 text-right font-mono text-white/50 hidden md:table-cell">{r.nights}</td>
+                        <td className="p-4 text-right font-mono text-white/50 hidden md:table-cell">{r.guests}</td>
+                        <td className="p-4 text-right font-mono text-[#c2a27c] hidden lg:table-cell">{r.count > 0 ? formatKES(Math.round(r.revenue / r.count)) : "—"}</td>
+                      </tr>
+                    ))
+                  )}
+                </tbody>
+                {revenueData.length > 0 && (
+                  <tfoot>
+                    <tr className="border-t-2 border-[#c2a27c]/30 bg-[#c2a27c]/5">
+                      <td className="p-4 font-mono text-xs uppercase tracking-widest text-[#c2a27c] font-bold">Totals</td>
+                      <td className="p-4 text-right font-mono text-white font-bold">{revenueTotals.count}</td>
+                      <td className="p-4 text-right font-mono text-[#c2a27c] font-bold text-base">{formatKES(revenueTotals.revenue)}</td>
+                      <td className="p-4 text-right font-mono text-white font-bold hidden md:table-cell">{revenueTotals.nights}</td>
+                      <td className="p-4 text-right font-mono text-white font-bold hidden md:table-cell">{revenueTotals.guests}</td>
+                      <td className="p-4 text-right font-mono text-[#c2a27c] hidden lg:table-cell">{revenueTotals.count > 0 ? formatKES(Math.round(revenueTotals.revenue / revenueTotals.count)) : "—"}</td>
+                    </tr>
+                  </tfoot>
+                )}
+              </table>
+            </div>
+          </div>
         </div>
+      )}
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          
-          {/* Master En-Suites */}
-          <div className="border border-white/10 rounded-xl p-6 bg-white/[0.01] space-y-4">
-            <div className="flex items-center justify-between">
-              <span className="font-serif text-xl text-[#e8e0d4]">Master En-Suites</span>
-              <Building className="w-5 h-5 text-[#c2a27c]" />
+      {/* ═══════════════════════════════════════════════════════════════
+          GUEST DIRECTORY TAB
+      ═══════════════════════════════════════════════════════════════ */}
+      {activeTab === "guests" && (
+        <div className="space-y-4">
+          <div className="flex flex-col sm:flex-row sm:items-center gap-3">
+            <div className="relative flex-1">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/30" />
+              <input
+                type="text"
+                value={gSearch}
+                onChange={(e) => { setGSearch(e.target.value); setGPage(0); }}
+                placeholder="Search by name, email, phone..."
+                className="w-full pl-10 pr-4 py-2.5 bg-white/5 border border-white/10 rounded-lg text-sm text-white placeholder-white/30 focus:outline-none focus:border-[#c2a27c]/50"
+              />
             </div>
-            <div className="space-y-1">
-              <p className="font-serif text-3xl text-white">$4,850</p>
-              <p className="font-mono text-[10px] text-white/40 uppercase tracking-widest">39% of Total Revenue</p>
-            </div>
-            <div className="pt-3 border-t border-white/5 text-xs text-white/60 flex justify-between font-mono">
-              <span>Occupancy:</span>
-              <span className="text-green-400 font-bold">84%</span>
-            </div>
+            <select
+              value={gVipFilter}
+              onChange={(e) => { setGVipFilter(e.target.value); setGPage(0); }}
+              className="px-3 py-2.5 bg-white/5 border border-white/10 rounded-lg text-xs font-mono text-white uppercase tracking-wider cursor-pointer focus:outline-none appearance-none"
+            >
+              <option value="all">All Guests</option>
+              <option value="vip">VIP Only</option>
+              <option value="returning">Returning</option>
+              <option value="new">First-Time</option>
+            </select>
+            <button onClick={exportGuestsCSV} className="px-4 py-2.5 rounded-lg bg-[#c2a27c] text-black text-xs font-mono uppercase tracking-widest font-bold hover:scale-105 transition-transform flex items-center gap-2 cursor-pointer">
+              <FileSpreadsheet className="w-4 h-4" /><span>Export CSV</span>
+            </button>
           </div>
 
-          {/* Guest Quarters */}
-          <div className="border border-white/10 rounded-xl p-6 bg-white/[0.01] space-y-4">
-            <div className="flex items-center justify-between">
-              <span className="font-serif text-xl text-[#e8e0d4]">Guest Quarters (6 Rooms)</span>
-              <Users className="w-5 h-5 text-[#c2a27c]" />
+          <div className="bg-white/[0.02] border border-white/10 rounded-xl overflow-hidden">
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="border-b border-white/10 bg-white/[0.03]">
+                    <SortHeader label="Name" sortKey="name" currentKey={gSortKey} currentDir={gSortDir} onSort={(k) => toggleSort(k, gSortKey, gSortDir, setGSortKey, setGSortDir)} />
+                    <th className="text-left p-4 font-mono text-[10px] uppercase tracking-widest text-white/40 hidden md:table-cell">Email</th>
+                    <th className="text-left p-4 font-mono text-[10px] uppercase tracking-widest text-white/40 hidden lg:table-cell">Phone</th>
+                    <SortHeader label="Stays" sortKey="totalStays" currentKey={gSortKey} currentDir={gSortDir} onSort={(k) => toggleSort(k, gSortKey, gSortDir, setGSortKey, setGSortDir)} />
+                    <SortHeader label="Last Visit" sortKey="lastVisit" currentKey={gSortKey} currentDir={gSortDir} onSort={(k) => toggleSort(k, gSortKey, gSortDir, setGSortKey, setGSortDir)} className="hidden md:table-cell" />
+                    <th className="text-center p-4 font-mono text-[10px] uppercase tracking-widest text-white/40">VIP</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {gPageData.length === 0 ? (
+                    <tr><td colSpan={6} className="p-12 text-center text-white/30">No guest records match your filters.</td></tr>
+                  ) : (
+                    gPageData.map((g: any) => (
+                      <tr key={g._id} className="border-b border-white/5 hover:bg-white/[0.03] transition-colors">
+                        <td className="p-4 font-serif text-white">{g.name}</td>
+                        <td className="p-4 font-mono text-xs text-white/50 hidden md:table-cell">{g.email}</td>
+                        <td className="p-4 font-mono text-xs text-white/50 hidden lg:table-cell">{g.phone || "—"}</td>
+                        <td className="p-4 font-mono text-sm text-white font-bold">{g.totalStays}</td>
+                        <td className="p-4 font-mono text-xs text-white/50 hidden md:table-cell">{g.lastVisit ? formatDate(g.lastVisit) : "—"}</td>
+                        <td className="p-4 text-center">{g.vip ? <Star className="w-4 h-4 text-[#c2a27c] inline fill-[#c2a27c]" /> : <span className="text-white/20">—</span>}</td>
+                      </tr>
+                    ))
+                  )}
+                </tbody>
+              </table>
             </div>
-            <div className="space-y-1">
-              <p className="font-serif text-3xl text-white">$3,600</p>
-              <p className="font-mono text-[10px] text-white/40 uppercase tracking-widest">29% of Total Revenue</p>
-            </div>
-            <div className="pt-3 border-t border-white/5 text-xs text-white/60 flex justify-between font-mono">
-              <span>Occupancy:</span>
-              <span className="text-green-400 font-bold">72%</span>
-            </div>
-          </div>
-
-          {/* Whole Estate Buyout */}
-          <div className="border border-white/10 rounded-xl p-6 bg-white/[0.01] space-y-4">
-            <div className="flex items-center justify-between">
-              <span className="font-serif text-xl text-[#e8e0d4]">Whole Estate Buyout</span>
-              <Wine className="w-5 h-5 text-[#c2a27c]" />
-            </div>
-            <div className="space-y-1">
-              <p className="font-serif text-3xl text-white">$4,000</p>
-              <p className="font-mono text-[10px] text-white/40 uppercase tracking-widest">32% of Total Revenue</p>
-            </div>
-            <div className="pt-3 border-t border-white/5 text-xs text-white/60 flex justify-between font-mono">
-              <span>Occupancy:</span>
-              <span className="text-green-400 font-bold">90%</span>
-            </div>
+            <Pagination page={gPage} totalPages={gTotalPages} totalRecords={filteredGuests.length} onPrev={() => setGPage((p) => Math.max(0, p - 1))} onNext={() => setGPage((p) => Math.min(gTotalPages - 1, p + 1))} />
           </div>
         </div>
-      </div>
+      )}
+
+      {/* ═══════════════════════════════════════════════════════════════
+          INQUIRY LOG TAB
+      ═══════════════════════════════════════════════════════════════ */}
+      {activeTab === "inquiries" && (
+        <div className="space-y-4">
+          <div className="flex flex-col sm:flex-row sm:items-center gap-3">
+            <div className="relative flex-1">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/30" />
+              <input
+                type="text"
+                value={iSearch}
+                onChange={(e) => { setISearch(e.target.value); setIPage(0); }}
+                placeholder="Search by name, email, subject, message..."
+                className="w-full pl-10 pr-4 py-2.5 bg-white/5 border border-white/10 rounded-lg text-sm text-white placeholder-white/30 focus:outline-none focus:border-[#c2a27c]/50"
+              />
+            </div>
+            <select
+              value={iStatusFilter}
+              onChange={(e) => { setIStatusFilter(e.target.value); setIPage(0); }}
+              className="px-3 py-2.5 bg-white/5 border border-white/10 rounded-lg text-xs font-mono text-white uppercase tracking-wider cursor-pointer focus:outline-none appearance-none"
+            >
+              <option value="all">All Status</option>
+              <option value="unread">Unread</option>
+              <option value="read">Read</option>
+            </select>
+            <button onClick={exportInquiriesCSV} className="px-4 py-2.5 rounded-lg bg-[#c2a27c] text-black text-xs font-mono uppercase tracking-widest font-bold hover:scale-105 transition-transform flex items-center gap-2 cursor-pointer">
+              <FileSpreadsheet className="w-4 h-4" /><span>Export CSV</span>
+            </button>
+          </div>
+
+          <div className="bg-white/[0.02] border border-white/10 rounded-xl overflow-hidden">
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="border-b border-white/10 bg-white/[0.03]">
+                    <th className="w-8 p-3"></th>
+                    <SortHeader label="Name" sortKey="name" currentKey={iSortKey} currentDir={iSortDir} onSort={(k) => toggleSort(k, iSortKey, iSortDir, setISortKey, setISortDir)} />
+                    <th className="text-left p-4 font-mono text-[10px] uppercase tracking-widest text-white/40 hidden md:table-cell">Email</th>
+                    <SortHeader label="Subject" sortKey="subject" currentKey={iSortKey} currentDir={iSortDir} onSort={(k) => toggleSort(k, iSortKey, iSortDir, setISortKey, setISortDir)} />
+                    <th className="text-left p-4 font-mono text-[10px] uppercase tracking-widest text-white/40">Status</th>
+                    <SortHeader label="Received" sortKey="createdAt" currentKey={iSortKey} currentDir={iSortDir} onSort={(k) => toggleSort(k, iSortKey, iSortDir, setISortKey, setISortDir)} />
+                  </tr>
+                </thead>
+                <tbody>
+                  {iPageData.length === 0 ? (
+                    <tr><td colSpan={6} className="p-12 text-center text-white/30">No inquiry records match your filters.</td></tr>
+                  ) : (
+                    iPageData.map((i: any) => (
+                      <>
+                        <tr
+                          key={i._id}
+                          onClick={() => setIExpandedRow(iExpandedRow === i._id ? null : i._id)}
+                          className={`border-b border-white/5 hover:bg-white/[0.03] transition-colors cursor-pointer ${i.status === "unread" ? "bg-[#c2a27c]/[0.03]" : ""}`}
+                        >
+                          <td className="p-3 text-white/30">
+                            {iExpandedRow === i._id ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+                          </td>
+                          <td className="p-4 font-serif text-white">
+                            <div className="flex items-center gap-2">
+                              {i.status === "unread" && <div className="w-2 h-2 rounded-full bg-[#c2a27c] animate-pulse" />}
+                              <span>{i.name}</span>
+                            </div>
+                          </td>
+                          <td className="p-4 font-mono text-xs text-white/50 hidden md:table-cell">{i.email}</td>
+                          <td className="p-4 text-white/70 text-sm max-w-[200px] truncate">{i.subject}</td>
+                          <td className="p-4"><StatusBadge status={i.status} /></td>
+                          <td className="p-4 font-mono text-xs text-white/50 whitespace-nowrap">{formatDate(i.createdAt)}</td>
+                        </tr>
+                        {iExpandedRow === i._id && (
+                          <tr key={`${i._id}-detail`} className="bg-white/[0.02]">
+                            <td colSpan={6} className="p-6">
+                              <div className="space-y-3">
+                                <div>
+                                  <p className="font-mono text-[9px] uppercase tracking-widest text-white/30 mb-1">From</p>
+                                  <p className="text-white text-sm">{i.name} &lt;{i.email}&gt;</p>
+                                </div>
+                                <div>
+                                  <p className="font-mono text-[9px] uppercase tracking-widest text-white/30 mb-1">Subject</p>
+                                  <p className="text-white text-sm font-medium">{i.subject}</p>
+                                </div>
+                                <div>
+                                  <p className="font-mono text-[9px] uppercase tracking-widest text-white/30 mb-1">Full Message</p>
+                                  <p className="text-white/70 text-sm leading-relaxed whitespace-pre-wrap bg-white/[0.02] border border-white/5 rounded-lg p-4">{i.message}</p>
+                                </div>
+                                <div>
+                                  <p className="font-mono text-[9px] uppercase tracking-widest text-white/30 mb-1">Received</p>
+                                  <p className="text-white/50 text-xs">{new Date(i.createdAt).toLocaleString("en-GB", { dateStyle: "full", timeStyle: "short" })}</p>
+                                </div>
+                              </div>
+                            </td>
+                          </tr>
+                        )}
+                      </>
+                    ))
+                  )}
+                </tbody>
+              </table>
+            </div>
+            <Pagination page={iPage} totalPages={iTotalPages} totalRecords={filteredInquiries.length} onPrev={() => setIPage((p) => Math.max(0, p - 1))} onNext={() => setIPage((p) => Math.min(iTotalPages - 1, p + 1))} />
+          </div>
+        </div>
+      )}
 
     </div>
   );

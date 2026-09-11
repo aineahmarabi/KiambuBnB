@@ -27,7 +27,13 @@ export const saveImage = mutation({
 export const getImages = query({
   handler: async (ctx) => {
     const images = await ctx.db.query("galleryImages").order("desc").collect();
-    return images;
+    const withUrls = await Promise.all(
+      images.map(async (image) => {
+        const url = await ctx.storage.getUrl(image.storageId);
+        return url ? { ...image, url } : null;
+      })
+    );
+    return withUrls.filter((img) => img !== null);
   },
 });
 
