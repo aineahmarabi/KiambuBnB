@@ -18,7 +18,8 @@ import {
   LogOut,
   Menu,
   Box,
-  Image as ImageIcon
+  Image as ImageIcon,
+  TrendingUp
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 
