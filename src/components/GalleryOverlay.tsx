@@ -71,11 +71,13 @@ export function GalleryOverlay({ isOpen, onClose }: { isOpen: boolean; onClose: 
       <div className="absolute inset-0 bg-[url('data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22180%22 height=%22180%22><filter id=%22n%22><feTurbulence type=%22fractalNoise%22 baseFrequency=%220.9%22 numOctaves=%222%22 stitchTiles=%22stitch%22/></filter><rect width=%22100%25%22 height=%22100%25%22 filter=%22url(%23n)%22/></svg>')] opacity-[0.05] mix-blend-overlay pointer-events-none"></div>
 
       {/* Header */}
-      <div className="sticky top-0 left-0 right-0 p-6 md:p-10 flex justify-between items-center z-50 bg-gradient-to-b from-[#0a0a0a] to-transparent pointer-events-none">
-        <h2 className="font-serif text-3xl md:text-5xl text-[#c2a27c] tracking-tighter mix-blend-difference pointer-events-auto">The Gallery.</h2>
+      <div className="sticky top-0 left-0 right-0 p-6 md:p-10 flex items-center justify-center z-50 bg-gradient-to-b from-[#0a0a0a] to-transparent pointer-events-none">
+        <h2 className="font-serif text-3xl md:text-5xl text-[#c2a27c] tracking-tighter mix-blend-difference pointer-events-auto text-center flex-1">
+          The Gallery.
+        </h2>
         <button 
           onClick={onClose}
-          className="w-12 h-12 rounded-full border border-white/20 flex items-center justify-center hover:bg-white/10 transition-colors pointer-events-auto backdrop-blur-md"
+          className="absolute right-6 md:right-10 w-12 h-12 rounded-full border border-white/20 flex items-center justify-center hover:bg-white/10 transition-colors pointer-events-auto backdrop-blur-md"
         >
           <X className="w-6 h-6 text-white" />
         </button>

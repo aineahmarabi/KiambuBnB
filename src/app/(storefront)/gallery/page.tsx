@@ -298,7 +298,15 @@ export default function GalleryPage() {
 
         {/* ── MODE 3: 3D HORIZON RIBBON STAGE ─────────────────────────────────── */}
         {layoutMode === 3 && (
-          <div className="w-full overflow-x-auto py-12 flex gap-8 snap-x snap-mandatory dark-scrollbar min-h-[65vh] items-center">
+          <div 
+            className="w-full overflow-x-auto py-12 flex gap-8 snap-x snap-mandatory dark-scrollbar min-h-[65vh] items-center"
+            onWheel={(e) => {
+              if (e.deltaY !== 0) {
+                e.preventDefault();
+                e.currentTarget.scrollLeft += e.deltaY;
+              }
+            }}
+          >
             {images.map((img: any, idx: number) => (
               <div
                 key={img._id || idx}
