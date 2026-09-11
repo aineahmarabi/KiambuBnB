@@ -5,6 +5,7 @@ import { api } from "../../../../convex/_generated/api";
 import { format } from "date-fns";
 import { Clock, MapPin, Plus, X, MoreVertical, Trash2, XCircle, LogOut, CheckCircle } from "lucide-react";
 import { useState, useRef, useEffect } from "react";
+import { CustomSelect } from "../../../components/ui/CustomSelect";
 
 export default function BookingsPage() {
   const bookings = useQuery(api.bookings?.getBookings || (() => []));
@@ -201,13 +202,13 @@ export default function BookingsPage() {
                   </>
                 ) : (
                   <>
-                    <div>
+                    <div className="z-20 relative">
                       <label className="block font-mono text-[10px] uppercase tracking-widest text-[#c2a27c] mb-2">Event Type</label>
-                      <select value={formData.eventType} onChange={e => setFormData({...formData, eventType: e.target.value})} className="w-full bg-black/40 border border-white/10 rounded-lg p-3 text-sm text-[#c2a27c] focus:outline-none focus:border-[#c2a27c] appearance-none">
-                        {packages?.filter((p: any) => p.category !== "Stay" && p.isActive).map((pkg: any) => (
-                          <option key={pkg._id} value={pkg.title}>{pkg.title}</option>
-                        ))}
-                      </select>
+                      <CustomSelect 
+                        value={formData.eventType}
+                        onChange={v => setFormData({...formData, eventType: v})}
+                        options={(packages || []).filter((p: any) => p.category !== "Stay" && p.isActive).map((pkg: any) => ({ value: pkg.title, label: pkg.title }))}
+                      />
                     </div>
                     <div>
                       <label className="block font-mono text-[10px] uppercase tracking-widest text-white/40 mb-2">Estimated Guests</label>
