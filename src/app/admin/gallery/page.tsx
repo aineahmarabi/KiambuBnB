@@ -3,7 +3,7 @@
 import { useState, useRef } from "react";
 import { useQuery, useMutation } from "convex/react";
 import { api } from "../../../../convex/_generated/api";
-import { Upload, X, Loader2, Image as ImageIcon } from "lucide-react";
+import { Upload, X, Loader2, Image as ImageIcon, Trash2 } from "lucide-react";
 import Image from "next/image";
 
 export default function AdminGallery() {
@@ -125,7 +125,7 @@ export default function AdminGallery() {
         ) : (
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
             {images.map((img: any) => (
-              <div key={img._id} className="group relative aspect-square rounded-xl overflow-hidden bg-white/5 border border-white/10">
+              <div key={img._id} className="group relative aspect-square rounded-xl overflow-hidden bg-white/5 border border-white/10 shadow-lg">
                 <Image 
                   src={img.url} 
                   alt="Gallery Image" 
@@ -134,18 +134,40 @@ export default function AdminGallery() {
                   sizes="(max-width: 768px) 50vw, 25vw"
                 />
                 
-                {/* Overlay actions */}
-                <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                {/* Always-visible Quick Delete Button (top right) */}
+                <button 
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleDelete(img._id, img.storageId);
+                  }}
+                  disabled={deletingId === img._id}
+                  className="absolute top-2 right-2 z-20 w-8 h-8 rounded-full bg-red-600/90 text-white flex items-center justify-center shadow-lg hover:bg-red-500 hover:scale-110 active:scale-95 transition-all cursor-pointer border border-red-400/30"
+                  title="Delete Image"
+                >
+                  {deletingId === img._id ? <Loader2 className="w-4 h-4 animate-spin" /> : <Trash2 className="w-4 h-4" />}
+                </button>
+
+                {/* Hover overlay with Delete confirmation label */}
+                <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center p-3">
                   <button 
                     onClick={(e) => {
                       e.stopPropagation();
                       handleDelete(img._id, img.storageId);
                     }}
                     disabled={deletingId === img._id}
-                    className="p-3 bg-red-500/20 text-red-400 rounded-full hover:bg-red-500 hover:text-white transition-colors"
-                    title="Delete Image"
+                    className="px-4 py-2 bg-red-600/90 hover:bg-red-500 text-white rounded-full text-xs font-mono uppercase tracking-widest flex items-center gap-2 shadow-xl cursor-pointer transition-all hover:scale-105"
                   >
-                    {deletingId === img._id ? <Loader2 className="w-5 h-5 animate-spin" /> : <X className="w-5 h-5" />}
+                    {deletingId === img._id ? (
+                      <>
+                        <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                        <span>Deleting...</span>
+                      </>
+                    ) : (
+                      <>
+                        <Trash2 className="w-3.5 h-3.5" />
+                        <span>Delete</span>
+                      </>
+                    )}
                   </button>
                 </div>
               </div>

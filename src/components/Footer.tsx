@@ -186,6 +186,42 @@ export function Footer() {
              </div>
           </div>
 
+          {/* Middle Section: Internal Links & Estate Quick Navigation */}
+          <div className="w-full border-t border-white/10 pt-10 pb-10 grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-6 gap-8 mb-12">
+            <div className="flex flex-col gap-3">
+              <span className="font-mono text-xs text-[#c2a27c] uppercase tracking-widest font-bold">The Estate</span>
+              <a href="#hero" className="text-white/60 hover:text-white text-sm transition-colors font-light">The Arrival</a>
+              <a href="#grounds" className="text-white/60 hover:text-white text-sm transition-colors font-light">Grounds &amp; Pool</a>
+              <a href="#location" className="text-white/60 hover:text-white text-sm transition-colors font-light">Kiambu Location</a>
+            </div>
+            <div className="flex flex-col gap-3">
+              <span className="font-mono text-xs text-[#c2a27c] uppercase tracking-widest font-bold">Accommodations</span>
+              <a href="#suites" className="text-white/60 hover:text-white text-sm transition-colors font-light">8 Bedroom Suites</a>
+              <a href="#suites" className="text-white/60 hover:text-white text-sm transition-colors font-light">Master En-Suites</a>
+              <a href="#suites" className="text-white/60 hover:text-white text-sm transition-colors font-light">Guest Quarters</a>
+            </div>
+            <div className="flex flex-col gap-3">
+              <span className="font-mono text-xs text-[#c2a27c] uppercase tracking-widest font-bold">Experiences</span>
+              <a href="#living" className="text-white/60 hover:text-white text-sm transition-colors font-light">Weddings &amp; Events</a>
+              <a href="#living" className="text-white/60 hover:text-white text-sm transition-colors font-light">Bridal Pick-Ups</a>
+              <a href="#living" className="text-white/60 hover:text-white text-sm transition-colors font-light">Family Picnics</a>
+            </div>
+            <div className="flex flex-col gap-3">
+              <span className="font-mono text-xs text-[#c2a27c] uppercase tracking-widest font-bold">Media &amp; Visuals</span>
+              <a href="#gallery" className="text-white/60 hover:text-white text-sm transition-colors font-light">Photo Gallery</a>
+              <a href="#gallery" className="text-white/60 hover:text-white text-sm transition-colors font-light">Virtual Tour</a>
+            </div>
+            <div className="flex flex-col gap-3">
+              <span className="font-mono text-xs text-[#c2a27c] uppercase tracking-widest font-bold">Reservations</span>
+              <Link href="/reserve" className="text-white/60 hover:text-white text-sm transition-colors font-light">Book Your Stay</Link>
+              <a href="#contact" className="text-white/60 hover:text-white text-sm transition-colors font-light">Inquire Event</a>
+            </div>
+            <div className="flex flex-col gap-3">
+              <span className="font-mono text-xs text-[#c2a27c] uppercase tracking-widest font-bold">Portal</span>
+              <Link href="/admin" className="text-white/60 hover:text-white text-sm transition-colors font-light">Admin Access</Link>
+            </div>
+          </div>
+
           <div className="flex-1"></div>
 
           {/* Bottom Section: Giant Typography & Socials */}
@@ -193,31 +229,31 @@ export function Footer() {
              
              {/* Left: Giant Brand Name */}
              <div className="w-full md:w-auto overflow-hidden">
-                <h1 className="text-[12vw] md:text-[8vw] font-serif tracking-tighter leading-none text-white/90 whitespace-nowrap opacity-90 select-none">
+                <div className="text-[12vw] md:text-[8vw] font-serif tracking-tighter leading-none text-white/90 whitespace-nowrap opacity-90 select-none">
                   Ficus &amp; Figs.
-                </h1>
+                </div>
              </div>
 
              {/* Right: Socials & Policies */}
              <div className="flex flex-col items-end gap-8 w-full md:w-auto">
                 <div className="flex gap-4">
-                  <a href={settings?.instagram || "#"} target="_blank" rel="noopener noreferrer" className="text-white/40 hover:text-[#c2a27c] hover:-translate-y-1 transition-all duration-300">
+                  <a href={settings?.instagram || "#"} target="_blank" rel="noopener noreferrer" aria-label="Instagram" className="text-white/40 hover:text-[#c2a27c] hover:-translate-y-1 transition-all duration-300">
                     <Instagram className="w-6 h-6" strokeWidth={1} />
                   </a>
-                  <a href={settings?.facebook || "#"} target="_blank" rel="noopener noreferrer" className="text-white/40 hover:text-[#c2a27c] hover:-translate-y-1 transition-all duration-300">
+                  <a href={settings?.facebook || "#"} target="_blank" rel="noopener noreferrer" aria-label="Facebook" className="text-white/40 hover:text-[#c2a27c] hover:-translate-y-1 transition-all duration-300">
                     <Facebook className="w-6 h-6" strokeWidth={1} />
                   </a>
-                  <a href={settings?.twitter || "#"} target="_blank" rel="noopener noreferrer" className="text-white/40 hover:text-[#c2a27c] hover:-translate-y-1 transition-all duration-300">
+                  <a href={settings?.twitter || "#"} target="_blank" rel="noopener noreferrer" aria-label="Twitter" className="text-white/40 hover:text-[#c2a27c] hover:-translate-y-1 transition-all duration-300">
                     <Twitter className="w-6 h-6" strokeWidth={1} />
                   </a>
-                  <a href={settings?.whatsapp ? `https://wa.me/${settings.whatsapp.replace(/\D/g,'')}` : "#"} target="_blank" rel="noopener noreferrer" className="text-white/40 hover:text-[#c2a27c] hover:-translate-y-1 transition-all duration-300">
+                  <a href={settings?.whatsapp ? `https://wa.me/${settings.whatsapp.replace(/\D/g,'')}` : "#"} target="_blank" rel="noopener noreferrer" aria-label="WhatsApp" className="text-white/40 hover:text-[#c2a27c] hover:-translate-y-1 transition-all duration-300">
                     <WhatsappIcon className="w-6 h-6" strokeWidth={1} />
                   </a>
                 </div>
 
                 <div className="flex gap-6 font-mono text-[10px] uppercase tracking-widest text-white/40">
-                  <button onClick={() => openModal("Terms of Service", TOS_CONTENT)} className="hover:text-[#c2a27c] transition-colors text-right">Terms</button>
-                  <button onClick={() => openModal("Privacy Policy", PRIVACY_CONTENT)} className="hover:text-[#c2a27c] transition-colors text-right">Privacy</button>
+                  <button onClick={() => openModal("Terms of Service", TOS_CONTENT)} className="hover:text-[#c2a27c] transition-colors text-right cursor-pointer">Terms</button>
+                  <button onClick={() => openModal("Privacy Policy", PRIVACY_CONTENT)} className="hover:text-[#c2a27c] transition-colors text-right cursor-pointer">Privacy</button>
                 </div>
                 
                 <p className="font-mono text-[9px] tracking-[0.2em] text-white/20 uppercase text-right mt-2">

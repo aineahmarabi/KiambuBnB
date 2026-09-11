@@ -279,18 +279,21 @@ export default function Storefront() {
               className="flex flex-col items-center w-full px-4"
             >
               <div className="mb-6 h-[180px] md:h-[220px] w-full flex items-center justify-center overflow-hidden">
-                <AnimatePresence mode="wait">
-                  <motion.h1 
-                    key={currentHeadlineIndex}
-                    initial={{ opacity: 0, y: 15, filter: "blur(4px)" }}
-                    animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-                    exit={{ opacity: 0, y: -15, filter: "blur(4px)" }}
-                    transition={{ duration: 1.2, ease: "easeInOut" }}
-                    className="text-4xl sm:text-5xl md:text-7xl lg:text-8xl font-serif tracking-tight uppercase font-light text-center text-balance leading-tight m-0 w-full"
-                  >
-                    {HEADLINES[currentHeadlineIndex].line1}<br/>{HEADLINES[currentHeadlineIndex].line2}
-                  </motion.h1>
-                </AnimatePresence>
+                <h1 className="text-4xl sm:text-5xl md:text-7xl lg:text-8xl font-serif tracking-tight uppercase font-light text-center text-balance leading-tight m-0 w-full">
+                  <span className="sr-only">Ficus and Figs — A Rustic 8-Bedroom Home in Kiambu</span>
+                  <AnimatePresence mode="wait">
+                    <motion.span 
+                      key={currentHeadlineIndex}
+                      initial={{ opacity: 0, y: 15, filter: "blur(4px)" }}
+                      animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+                      exit={{ opacity: 0, y: -15, filter: "blur(4px)" }}
+                      transition={{ duration: 1.2, ease: "easeInOut" }}
+                      className="block"
+                    >
+                      {HEADLINES[currentHeadlineIndex].line1}<br/>{HEADLINES[currentHeadlineIndex].line2}
+                    </motion.span>
+                  </AnimatePresence>
+                </h1>
               </div>
               <div className="w-16 h-[1px] bg-[#c2a27c] mb-6"></div>
               <p className="font-mono tracking-[0.2em] text-[#c2a27c] text-sm uppercase mb-8">Welcome to Ficus &amp; Figs</p>
@@ -365,7 +368,9 @@ export default function Storefront() {
         <div className="text-center mb-20 slide-in">
           <Trees className="w-8 h-8 mx-auto text-[#c2a27c] mb-6" strokeWidth={1} />
           <h2 className="text-4xl md:text-6xl font-serif font-light mb-4">Space to Breathe</h2>
-          <p className="text-white/60 max-w-2xl mx-auto font-light">Surrounded by nature, our grounds offer a sanctuary of absolute silence. Featuring a beautiful pool, lush garden, and dedicated staff quarters.</p>
+          <p className="text-white/60 max-w-3xl mx-auto font-light leading-relaxed text-base md:text-lg">
+            Surrounded by pristine nature, our private estate grounds offer an unparalleled sanctuary of quiet elegance. Featuring a shimmering outdoor swimming pool, manicured gardens, expansive sun terraces, and dedicated staff quarters, Ficus &amp; Figs provides the ultimate escape for families, bridal parties, and private retreats seeking total peace in Kiambu.
+          </p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
@@ -401,7 +406,7 @@ export default function Storefront() {
         <div className="absolute top-10 md:top-20 left-6 md:left-12 z-50 slide-in">
           <BedDouble className="w-8 h-8 text-[#c2a27c] mb-6" strokeWidth={1} />
           <h2 className="text-4xl md:text-6xl font-serif font-light mb-4">Eight Sanctuaries</h2>
-          <p className="font-mono tracking-widest text-[#c2a27c] text-xs uppercase mb-4">Uncompromising Comfort</p>
+          <p className="font-mono tracking-widest text-[#c2a27c] text-xs uppercase mb-4">Uncompromising Comfort • Sleeps 16 Guests</p>
           <div className="w-12 h-[1px] bg-[#c2a27c]"></div>
         </div>
 
@@ -414,7 +419,7 @@ export default function Storefront() {
           <div className="flex gap-8 items-center w-[85vw] md:w-[50vw]">
             <div className="w-1/3 shrink-0">
               <h3 className="text-2xl md:text-3xl font-serif mb-4 text-[#e8e0d4]">The Master Ensuites</h3>
-              <p className="text-white/60 text-sm leading-relaxed">Vaulted ceilings, intricate parquet flooring. Two masterful suites designed for pure rejuvenation.</p>
+              <p className="text-white/60 text-sm leading-relaxed">Vaulted ceilings, intricate parquet flooring, and private balcony vistas. Two masterful suites designed for pure rejuvenation and timeless relaxation.</p>
             </div>
             <div className="w-2/3 h-full aspect-[4/5] relative overflow-hidden rounded-2xl border border-white/10 shadow-2xl">
               <Image src="/images/IMG_9269.JPG.jpeg" alt="Master Suite One" fill className="object-cover" />
@@ -433,7 +438,7 @@ export default function Storefront() {
             </div>
             <div className="w-1/3 shrink-0">
               <h3 className="text-2xl md:text-3xl font-serif mb-4 text-[#e8e0d4]">Guest Quarters</h3>
-              <p className="text-white/60 text-sm leading-relaxed">Six exquisitely appointed bedrooms providing a serene escape. Perfect for family.</p>
+              <p className="text-white/60 text-sm leading-relaxed">Six exquisitely appointed bedrooms providing a serene escape for up to 16 guests. Crafted with organic materials, plush bedding, and calm earth tones.</p>
             </div>
           </div>
 
@@ -457,7 +462,7 @@ export default function Storefront() {
             <div className="w-full md:w-1/4 shrink-0 text-center md:text-left">
               <Bath className="w-8 h-8 text-[#c2a27c] mb-4 md:mb-6 mx-auto md:mx-0" strokeWidth={1} />
               <h3 className="text-2xl md:text-3xl font-serif mb-4 text-[#e8e0d4]">Modern Elegance</h3>
-              <p className="text-white/60 text-sm leading-relaxed">Premium finishes and abundant natural light.</p>
+              <p className="text-white/60 text-sm leading-relaxed">Spa-inspired bathrooms equipped with rainfall showers, premium stone finishes, and abundant natural sunlight.</p>
             </div>
             <div className="w-full md:w-3/4 grid grid-cols-3 gap-3 shrink-0">
               <div className="aspect-[3/4] relative overflow-hidden rounded-2xl border border-white/10"><Image src="/images/IMG_9265.JPG.jpeg" alt="Bath 1" fill className="object-cover" /></div>
@@ -472,7 +477,7 @@ export default function Storefront() {
         <div className="w-full text-center space-y-8 mb-24 slide-in">
           <Wine className="w-8 h-8 mx-auto text-[#c2a27c]" strokeWidth={1} />
           <h2 className="text-4xl md:text-6xl font-serif font-light mb-4">Gatherings &amp; Events</h2>
-          <p className="font-mono tracking-widest text-[#c2a27c] text-xs uppercase">Weddings • Parties • Picnics</p>
+          <p className="font-mono tracking-widest text-[#c2a27c] text-xs uppercase">Weddings • Bridal Pick-Ups • Family Reunions • Corporate Retreats</p>
         </div>
         
         <div className="grid grid-cols-1 md:grid-cols-12 gap-6 mb-24">
@@ -481,7 +486,7 @@ export default function Storefront() {
           </div>
           <div className="md:col-span-5 flex flex-col gap-6">
             <div className="backdrop-blur-md bg-white/5 border border-white/10 p-8 rounded-xl slide-in-left">
-               <p className="text-white/70 font-light leading-relaxed">Whether you are planning a grand family reunion or an unforgettable celebration, Ficus &amp; Figs is the perfect canvas. Our expansive grounds and grand living areas are perfectly equipped to host spectacular weddings, private parties, and elegant picnics under the sun.</p>
+               <p className="text-white/70 font-light leading-relaxed">Whether you are planning an intimate family reunion, a bridal pick-up celebration, or an unforgettable garden event, Ficus &amp; Figs is the ultimate venue. Our sprawling grounds and grand indoor living areas accommodate up to 16 overnight guests with ample space for memorable outdoor gatherings under the Kenyan sky.</p>
             </div>
             <div className="flex-1 relative overflow-hidden rounded-xl border border-white/5 slide-in group min-h-[250px]">
               <Image src="/images/IMG_9275.JPG.jpeg" alt="Living Room View" fill className="object-cover parallax-image" />
@@ -501,7 +506,10 @@ export default function Storefront() {
           <div className="md:col-span-7 order-1 md:order-2 flex flex-col gap-6">
             <div className="text-center md:text-left slide-in-left">
               <Coffee className="w-8 h-8 text-[#c2a27c] mb-4 mx-auto md:mx-0" strokeWidth={1} />
-              <h3 className="text-3xl font-serif font-light mb-4">Culinary Comfort</h3>
+              <h3 className="text-3xl font-serif font-light mb-4">Culinary Comfort &amp; Dining</h3>
+              <p className="text-white/60 font-light leading-relaxed max-w-xl mb-4">
+                Our chef-ready gourmet kitchen is fully outfitted with modern appliances, ample refrigeration, and spacious food prep counters. Enjoy private dining indoors or alfresco dining on the veranda overlooking the gardens.
+              </p>
             </div>
             <div className="aspect-[4/5] relative overflow-hidden rounded-xl border border-white/5 slide-in group w-full">
               <Image src="/images/IMG_9268.JPG.jpeg" alt="Modern Kitchen" fill className="object-cover parallax-image" />
@@ -514,7 +522,8 @@ export default function Storefront() {
       <section id="gallery" className="pt-12 pb-16 md:py-24 bg-[#100f0d]">
         <div ref={fanContainerRef} className="w-full flex flex-col items-center justify-center relative gap-8 md:gap-16">
           <div className="text-center z-50">
-            <h2 className="text-4xl md:text-6xl font-serif font-light mb-0">The Gallery</h2>
+            <h2 className="text-4xl md:text-6xl font-serif font-light mb-2">The Gallery</h2>
+            <p className="text-white/50 text-sm font-light max-w-md mx-auto">Explore high-resolution photography capturing our rooms, private pool, and estate grounds.</p>
           </div>
           
           <div className="relative w-[55vw] md:w-[25vw] aspect-[3/4] cursor-pointer group z-10"
@@ -536,7 +545,7 @@ export default function Storefront() {
               </div>
             ))}
             <div className="absolute inset-0 z-50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-500">
-               <span className="font-mono text-[10px] uppercase tracking-widest text-black bg-[#c2a27c] px-6 py-3 rounded-full shadow-[0_0_20px_rgba(194,162,124,0.5)]">Enter Dimensions</span>
+               <span className="font-mono text-[10px] uppercase tracking-widest text-black bg-[#c2a27c] px-6 py-3 rounded-full shadow-[0_0_20px_rgba(194,162,124,0.5)]">Enter Gallery</span>
             </div>
           </div>
         </div>
@@ -546,7 +555,9 @@ export default function Storefront() {
         <div className="w-full text-center space-y-8 mb-16 slide-in">
           <MapPin className="w-8 h-8 mx-auto text-[#c2a27c]" strokeWidth={1} />
           <h2 className="text-4xl md:text-6xl font-serif font-light">Find Your Way</h2>
-          <p className="text-white/60 font-light max-w-xl mx-auto">Nestled in the serene landscapes of Kiambu. Our gates are always open for you.</p>
+          <p className="text-white/60 font-light max-w-xl mx-auto leading-relaxed">
+            Conveniently situated in the serene landscapes of Kiambu, Kenya. Ficus &amp; Figs offers an easily accessible retreat just minutes from major transport links, surrounded by lush coffee countryside and peaceful scenery.
+          </p>
         </div>
 
         <div className="w-full aspect-square md:aspect-[21/9] relative overflow-hidden rounded-xl border border-white/10 slide-in group">

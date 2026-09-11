@@ -45,11 +45,11 @@ export function Navigation() {
 
         {/* Centered Title */}
         <div className="absolute left-1/2 -translate-x-1/2 top-8 md:top-12 pointer-events-auto text-center">
-          <button onClick={() => scrollTo('hero')} className="hover:opacity-70 transition-opacity flex flex-col items-center">
-            <h1 className="font-serif text-xl md:text-2xl tracking-[0.3em] uppercase font-light cursor-pointer leading-tight text-white/90 hover:text-white transition-colors">
-              Ficus & Figs
-            </h1>
-          </button>
+          <a href="#hero" onClick={(e) => { e.preventDefault(); scrollTo('hero'); }} className="hover:opacity-70 transition-opacity flex flex-col items-center">
+            <span className="font-serif text-xl md:text-2xl tracking-[0.3em] uppercase font-light cursor-pointer leading-tight text-white/90 hover:text-white transition-colors">
+              Ficus &amp; Figs
+            </span>
+          </a>
         </div>
 
         {/* CTA (Desktop) */}
@@ -91,16 +91,17 @@ export function Navigation() {
             
             <nav className="flex flex-col gap-8">
               {sections.map((section, i) => (
-                <motion.button
+                <motion.a
                   key={section.id}
+                  href={`#${section.id}`}
                   initial={{ opacity: 0, x: -20 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: 0.4 + (i * 0.1) }}
-                  onClick={() => scrollTo(section.id)}
+                  onClick={(e) => { e.preventDefault(); scrollTo(section.id); }}
                   className="text-left font-serif text-4xl md:text-6xl text-white/80 hover:text-white hover:translate-x-4 transition-all duration-500 font-light"
                 >
                   {section.name}
-                </motion.button>
+                </motion.a>
               ))}
             </nav>
             <div className="mt-8">
