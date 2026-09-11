@@ -102,8 +102,8 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   };
 
   return (
-    <div className="flex h-screen w-full overflow-hidden bg-[#0a0a0a] text-[#e8e0d4] font-body selection:bg-[#c2a27c] selection:text-black">
-      <div className="grain-overlay" aria-hidden="true" />
+    <div className="flex h-screen w-full overflow-hidden bg-[#0a0a0a] text-[#e8e0d4] font-body selection:bg-[#c2a27c] selection:text-black print:overflow-visible print:h-auto print:bg-white print:text-black">
+      <div className="grain-overlay print:hidden" aria-hidden="true" />
       
       {/* Mobile Overlay */}
       {!isCollapsed && (
@@ -115,7 +115,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
       {/* Sidebar */}
       <aside 
-        className={`${isCollapsed ? "-translate-x-full md:translate-x-0 md:w-20" : "translate-x-0 w-64"} fixed md:relative inset-y-0 left-0 bg-[#0a0a0a] md:bg-black/40 backdrop-blur-md border-r border-white/10 flex flex-col transition-all duration-300 z-50`}
+        className={`print:hidden ${isCollapsed ? "-translate-x-full md:translate-x-0 md:w-20" : "translate-x-0 w-64"} fixed md:relative inset-y-0 left-0 bg-[#0a0a0a] md:bg-black/40 backdrop-blur-md border-r border-white/10 flex flex-col transition-all duration-300 z-50`}
       >
         <div className="h-20 flex items-center border-b border-white/10 px-6">
           {!isCollapsed && (
@@ -199,7 +199,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       <div className="flex-1 flex flex-col min-w-0 relative z-10">
         
         {/* Top Header */}
-        <header className="h-20 bg-black/20 backdrop-blur-sm border-b border-white/10 flex items-center justify-between px-4 md:px-8 sticky top-0 z-30">
+        <header className="print:hidden h-20 bg-black/20 backdrop-blur-sm border-b border-white/10 flex items-center justify-between px-4 md:px-8 sticky top-0 z-30">
           <div className="flex items-center gap-4 text-white/50">
              <button 
                onClick={() => setIsCollapsed(!isCollapsed)}
@@ -278,13 +278,13 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         </header>
 
         {/* Page Content */}
-        <main className="flex-1 overflow-y-auto dark-scrollbar p-6 md:p-8 flex flex-col">
+        <main className="flex-1 overflow-y-auto dark-scrollbar p-6 md:p-8 flex flex-col print:overflow-visible print:p-0">
           <div className="flex-1">
             {children}
           </div>
           
           {/* Admin Footer */}
-          <footer className="mt-12 pt-6 border-t border-white/10 text-center">
+          <footer className="print:hidden mt-12 pt-6 border-t border-white/10 text-center">
             <p className="font-mono text-[10px] tracking-widest text-white/30 uppercase">
               &copy; {new Date().getFullYear()} Ficus & Figs. All Rights Reserved.
             </p>

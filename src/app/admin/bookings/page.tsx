@@ -9,6 +9,7 @@ import { useState, useRef, useEffect } from "react";
 export default function BookingsPage() {
   const bookings = useQuery(api.bookings?.getBookings || (() => []));
   const settings = useQuery(api.settings?.getSettings || (() => null));
+  const packages = useQuery(api.packages?.getPackages || (() => []));
   
   // Dynamically classify active bookings based on current time
   const now = Date.now();
@@ -203,11 +204,9 @@ export default function BookingsPage() {
                     <div>
                       <label className="block font-mono text-[10px] uppercase tracking-widest text-[#c2a27c] mb-2">Event Type</label>
                       <select value={formData.eventType} onChange={e => setFormData({...formData, eventType: e.target.value})} className="w-full bg-black/40 border border-white/10 rounded-lg p-3 text-sm text-[#c2a27c] focus:outline-none focus:border-[#c2a27c] appearance-none">
-                        <option value="Wedding">Wedding</option>
-                        <option value="Party">Private Party</option>
-                        <option value="Corporate">Corporate Retreat</option>
-                        <option value="Picnic">Picnic / Gathering</option>
-                        <option value="Other">Other Event</option>
+                        {packages?.filter((p: any) => p.category !== "Stay" && p.isActive).map((pkg: any) => (
+                          <option key={pkg._id} value={pkg.title}>{pkg.title}</option>
+                        ))}
                       </select>
                     </div>
                     <div>
@@ -222,7 +221,7 @@ export default function BookingsPage() {
                     <span className="absolute left-4 top-1/2 -translate-y-1/2 text-[#c2a27c] font-mono">$</span>
                     <input type="number" required value={formData.totalPrice} onChange={e=>setFormData({...formData, totalPrice: Number(e.target.value)})} className="w-full pl-8 pr-4 py-3 bg-black/60 border border-white/10 rounded-lg text-white focus:outline-none focus:border-[#c2a27c]" />
                   </div>
-                  <p className="text-[10px] text-white/30 mt-2 font-light">Auto-calculated based on <span className="text-white/60">${settings?.basePricePerNight}/night</span> (≈ KES {((settings?.basePricePerNight || 0) * 130).toLocaleString()}), but you can override this value. Total ≈ KES {(formData.totalPrice * 130).toLocaleString()}</p>
+                  <p className="text-[10px] text-white/30 mt-2 font-light">Auto-calculated based on <span className="text-white/60">${settings?.basePricePerNight}/night</span>. Equivalent to approx KES {(formData.totalPrice * 129).toLocaleString()}</p>
                 </div>
                 <div className="md:col-span-2">
                   <label className="block font-mono text-[10px] uppercase tracking-widest text-white/40 mb-2">Notes / Special Requests (Optional)</label>

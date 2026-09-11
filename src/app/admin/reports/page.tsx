@@ -1,7 +1,8 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useRef, useEffect } from "react";
 import { useQuery } from "convex/react";
+import { format, addMonths, subMonths, startOfMonth, endOfMonth, eachDayOfInterval, isSameMonth, isSameDay, startOfWeek, endOfWeek } from "date-fns";
 import { api } from "../../../../convex/_generated/api";
 import {
   Download,
@@ -61,6 +62,113 @@ const nightsBetween = (checkIn: number, checkOut: number) =>
   Math.max(1, Math.round((checkOut - checkIn) / (1000 * 60 * 60 * 24)));
 
 const ROWS_PER_PAGE = 15;
+
+const CustomSelect = ({ value, onChange, options, placeholder }: { value: string; onChange: (v: string) => void; options: {value: string; label: string}[]; placeholder?: string }) => {
+  const [open, setOpen] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const handleClick = (e: MouseEvent) => { if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false); };
+    document.addEventListener("mousedown", handleClick);
+    return () => document.removeEventListener("mousedown", handleClick);
+  }, []);
+  
+  return (
+    <div className="relative min-w-[140px]" ref={ref}>
+      <button
+        onClick={() => setOpen(!open)}
+        className="w-full px-3 py-2.5 bg-white/5 border border-white/10 rounded-lg text-xs font-mono text-white uppercase tracking-wider flex items-center justify-between gap-2 hover:border-[#c2a27c]/50 transition-colors"
+      >
+        <span className="truncate">{options.find(o => o.value === value)?.label || placeholder}</span>
+        <ChevronDown className={`w-3 h-3 text-white/50 transition-transform ${open ? 'rotate-180' : ''}`} />
+      </button>
+      {open && (
+        <div className="absolute top-full mt-2 left-0 w-full bg-[#111] border border-white/10 rounded-lg overflow-hidden z-50 shadow-2xl">
+          {options.map((o) => (
+            <div
+              key={o.value}
+              onClick={() => { onChange(o.value); setOpen(false); }}
+              className={`px-3 py-2 text-xs font-mono uppercase tracking-wider cursor-pointer transition-colors ${value === o.value ? 'text-[#c2a27c] bg-[#c2a27c]/10' : 'text-white/70 hover:bg-white/10 hover:text-white'}`}
+            >
+              {o.label}
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+};
+
+const CustomDatePicker = ({ value, onChange, placeholder }: { value: string; onChange: (v: string) => void; placeholder: string }) => {
+  const [open, setOpen] = useState(false);
+  const [viewDate, setViewDate] = useState(value ? new Date(value) : new Date());
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClick = (e: MouseEvent) => { if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false); };
+    document.addEventListener("mousedown", handleClick);
+    return () => document.removeEventListener("mousedown", handleClick);
+  }, []);
+
+  useEffect(() => { if (value) setViewDate(new Date(value)); }, [value]);
+
+  const days = eachDayOfInterval({
+    start: startOfWeek(startOfMonth(viewDate)),
+    end: endOfWeek(endOfMonth(viewDate))
+  });
+
+  return (
+    <div className="relative min-w-[140px]" ref={ref}>
+      <button
+        onClick={() => { setViewDate(value ? new Date(value) : new Date()); setOpen(!open); }}
+        className="w-full px-3 py-2.5 bg-white/5 border border-white/10 rounded-lg text-xs font-mono text-white uppercase tracking-wider flex items-center gap-2 hover:border-[#c2a27c]/50 transition-colors"
+      >
+        <Calendar className="w-3.5 h-3.5 text-[#c2a27c]" />
+        <span className="truncate">{value ? format(new Date(value), "MMM dd, yyyy") : placeholder}</span>
+      </button>
+      
+      {open && (
+        <div className="absolute top-full mt-2 left-0 w-64 bg-[#111] border border-white/10 rounded-xl overflow-hidden z-50 shadow-2xl p-3">
+          <div className="flex items-center justify-between mb-3">
+            <button onClick={() => setViewDate(subMonths(viewDate, 1))} className="p-1 text-white/50 hover:text-white rounded-md hover:bg-white/10 transition-colors"><ChevronLeft className="w-4 h-4"/></button>
+            <span className="font-serif text-white">{format(viewDate, "MMMM yyyy")}</span>
+            <button onClick={() => setViewDate(addMonths(viewDate, 1))} className="p-1 text-white/50 hover:text-white rounded-md hover:bg-white/10 transition-colors"><ChevronRight className="w-4 h-4"/></button>
+          </div>
+          <div className="grid grid-cols-7 gap-1 mb-1">
+            {['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'].map(d => (
+              <div key={d} className="text-[10px] font-mono text-center text-white/30">{d}</div>
+            ))}
+          </div>
+          <div className="grid grid-cols-7 gap-1">
+            {days.map((day, i) => {
+              const isSelected = value && isSameDay(day, new Date(value));
+              const isCurrentMonth = isSameMonth(day, viewDate);
+              return (
+                <button
+                  key={i}
+                  onClick={() => { onChange(format(day, "yyyy-MM-dd")); setOpen(false); }}
+                  className={`h-7 w-7 flex items-center justify-center rounded-full text-xs font-mono transition-colors ${
+                    isSelected ? 'bg-[#c2a27c] text-black font-bold' :
+                    isCurrentMonth ? 'text-white hover:bg-white/10' : 'text-white/20 hover:text-white/50'
+                  }`}
+                >
+                  {format(day, "d")}
+                </button>
+              );
+            })}
+          </div>
+          {value && (
+            <button 
+              onClick={() => { onChange(""); setOpen(false); }} 
+              className="mt-3 w-full py-1.5 text-[10px] font-mono text-red-400 hover:bg-red-400/10 rounded-lg transition-colors uppercase tracking-widest"
+            >
+              Clear Date
+            </button>
+          )}
+        </div>
+      )}
+    </div>
+  );
+};
 
 export default function AdminReportsPage() {
   const bookings = useQuery(api.bookings?.getBookings || (() => []));
@@ -552,54 +660,38 @@ export default function AdminReportsPage() {
               </div>
 
               {/* Status Filter */}
-              <select
+              <CustomSelect
                 value={bStatusFilter}
-                onChange={(e) => { setBStatusFilter(e.target.value); setBPage(0); }}
-                className="px-3 py-2.5 bg-white/5 border border-white/10 rounded-lg text-xs font-mono text-white uppercase tracking-wider cursor-pointer focus:outline-none focus:border-[#c2a27c]/50 appearance-none"
-              >
-                <option value="all">All Statuses</option>
-                <option value="hosting">Hosting</option>
-                <option value="upcoming">Upcoming</option>
-                <option value="past">Past</option>
-                <option value="cancelled">Cancelled</option>
-              </select>
+                onChange={(v) => { setBStatusFilter(v); setBPage(0); }}
+                options={[{value:"all",label:"All Statuses"},{value:"hosting",label:"Hosting"},{value:"upcoming",label:"Upcoming"},{value:"past",label:"Past"},{value:"cancelled",label:"Cancelled"}]}
+              />
 
               {/* Payment Filter */}
-              <select
+              <CustomSelect
                 value={bPaymentFilter}
-                onChange={(e) => { setBPaymentFilter(e.target.value); setBPage(0); }}
-                className="px-3 py-2.5 bg-white/5 border border-white/10 rounded-lg text-xs font-mono text-white uppercase tracking-wider cursor-pointer focus:outline-none focus:border-[#c2a27c]/50 appearance-none"
-              >
-                <option value="all">All Payments</option>
-                <option value="confirmed">Confirmed</option>
-                <option value="pending">Pending</option>
-              </select>
+                onChange={(v) => { setBPaymentFilter(v); setBPage(0); }}
+                options={[{value:"all",label:"All Payments"},{value:"confirmed",label:"Confirmed"},{value:"pending",label:"Pending"}]}
+              />
 
               {/* Type Filter */}
-              <select
+              <CustomSelect
                 value={bTypeFilter}
-                onChange={(e) => { setBTypeFilter(e.target.value); setBPage(0); }}
-                className="px-3 py-2.5 bg-white/5 border border-white/10 rounded-lg text-xs font-mono text-white uppercase tracking-wider cursor-pointer focus:outline-none focus:border-[#c2a27c]/50 appearance-none"
-              >
-                <option value="all">All Types</option>
-                <option value="stay">Stays</option>
-                <option value="event">Events</option>
-              </select>
+                onChange={(v) => { setBTypeFilter(v); setBPage(0); }}
+                options={[{value:"all",label:"All Types"},{value:"stay",label:"Stays"},{value:"event",label:"Events"}]}
+              />
 
               {/* Date Range */}
               <div className="flex items-center gap-2">
-                <input
-                  type="date"
+                <CustomDatePicker
                   value={bDateFrom}
-                  onChange={(e) => { setBDateFrom(e.target.value); setBPage(0); }}
-                  className="px-3 py-2.5 bg-white/5 border border-white/10 rounded-lg text-xs font-mono text-white cursor-pointer focus:outline-none focus:border-[#c2a27c]/50"
+                  onChange={(v) => { setBDateFrom(v); setBPage(0); }}
+                  placeholder="Start Date"
                 />
                 <span className="text-white/30 text-xs">to</span>
-                <input
-                  type="date"
+                <CustomDatePicker
                   value={bDateTo}
-                  onChange={(e) => { setBDateTo(e.target.value); setBPage(0); }}
-                  className="px-3 py-2.5 bg-white/5 border border-white/10 rounded-lg text-xs font-mono text-white cursor-pointer focus:outline-none focus:border-[#c2a27c]/50"
+                  onChange={(v) => { setBDateTo(v); setBPage(0); }}
+                  placeholder="End Date"
                 />
               </div>
 
@@ -871,16 +963,11 @@ export default function AdminReportsPage() {
                 className="w-full pl-10 pr-4 py-2.5 bg-white/5 border border-white/10 rounded-lg text-sm text-white placeholder-white/30 focus:outline-none focus:border-[#c2a27c]/50"
               />
             </div>
-            <select
+            <CustomSelect
               value={gVipFilter}
-              onChange={(e) => { setGVipFilter(e.target.value); setGPage(0); }}
-              className="px-3 py-2.5 bg-white/5 border border-white/10 rounded-lg text-xs font-mono text-white uppercase tracking-wider cursor-pointer focus:outline-none appearance-none"
-            >
-              <option value="all">All Guests</option>
-              <option value="vip">VIP Only</option>
-              <option value="returning">Returning</option>
-              <option value="new">First-Time</option>
-            </select>
+              onChange={(v) => { setGVipFilter(v); setGPage(0); }}
+              options={[{value:"all",label:"All Guests"},{value:"vip",label:"VIP Only"},{value:"returning",label:"Returning"},{value:"new",label:"First-Time"}]}
+            />
             <button onClick={exportGuestsCSV} className="px-4 py-2.5 rounded-lg bg-[#c2a27c] text-black text-xs font-mono uppercase tracking-widest font-bold hover:scale-105 transition-transform flex items-center gap-2 cursor-pointer">
               <FileSpreadsheet className="w-4 h-4" /><span>Export CSV</span>
             </button>
@@ -938,15 +1025,11 @@ export default function AdminReportsPage() {
                 className="w-full pl-10 pr-4 py-2.5 bg-white/5 border border-white/10 rounded-lg text-sm text-white placeholder-white/30 focus:outline-none focus:border-[#c2a27c]/50"
               />
             </div>
-            <select
+            <CustomSelect
               value={iStatusFilter}
-              onChange={(e) => { setIStatusFilter(e.target.value); setIPage(0); }}
-              className="px-3 py-2.5 bg-white/5 border border-white/10 rounded-lg text-xs font-mono text-white uppercase tracking-wider cursor-pointer focus:outline-none appearance-none"
-            >
-              <option value="all">All Status</option>
-              <option value="unread">Unread</option>
-              <option value="read">Read</option>
-            </select>
+              onChange={(v) => { setIStatusFilter(v); setIPage(0); }}
+              options={[{value:"all",label:"All Status"},{value:"unread",label:"Unread"},{value:"read",label:"Read"}]}
+            />
             <button onClick={exportInquiriesCSV} className="px-4 py-2.5 rounded-lg bg-[#c2a27c] text-black text-xs font-mono uppercase tracking-widest font-bold hover:scale-105 transition-transform flex items-center gap-2 cursor-pointer">
               <FileSpreadsheet className="w-4 h-4" /><span>Export CSV</span>
             </button>
